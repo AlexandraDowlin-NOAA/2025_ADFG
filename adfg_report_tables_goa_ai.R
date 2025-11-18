@@ -197,19 +197,22 @@ specimen_voucher_total <-
   )
 
 # Write to .csv
+if(!dir.exists(here::here("output",region,"tables"))){
+  dir.create(here::here("output",region,"tables"))
+}
 
 write.csv(x = catch_state,
-          file = here::here("assets", "adfg_report", paste0(region, "_", cruise, "_adfg_catch_state.csv")),
+          file = here::here("output", region, paste0(region, "_", cruise, "_adfg_catch_state.csv")),
           row.names = FALSE)
 
 write.csv(x = catch_total,
-          file = here::here("assets", "adfg_report", paste0(region, "_", cruise, "_adfg_catch_total.csv")),
+          file = here::here("output", region, paste0(region, "_", cruise, "_adfg_catch_total.csv")),
           row.names = FALSE)
 
 write.csv(x = specimen_state,
-          file = here::here("assets", "adfg_report", paste0(region, "_", cruise, "_adfg_specimens_state.csv")),
+          file = here::here("output", region, paste0(region, "_", cruise, "_adfg_specimens_state.csv")),
           row.names = FALSE)
 
 write.csv(x = specimen_total,
-          file = here::here("assets", "adfg_report", paste0(region, "_", cruise, "_adfg_specimens_total.csv")),
+          file = here::here("output", region, paste0(region, "_", cruise, "_adfg_specimens_total.csv")),
           row.names = FALSE)
