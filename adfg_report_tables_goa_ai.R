@@ -1,7 +1,8 @@
+# Author: Sean Rohan 
 
 # Set vessel, cruise, and region ----
 vessel <- c(148, 176)
-cruise <- 202301
+cruise <- 202501
 region <- tolower("goa")
 
 # Retrieve towpath lines -- need to first generate towpaths using make_layers_goa.R or make_layers_ai.R
