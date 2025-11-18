@@ -1,0 +1,273 @@
+---
+title: Report of 2024 Research Activities 
+author:
+- affiliation: RACE
+  description: Fish Biologist
+  email: Alexandra.Dowlin@NOAA.gov
+  name: Alexandra Dowlin
+output: 
+  word_document: 
+    reference_docx: template-adfg.docx
+fontsize:
+addr:
+  l1: 7600 Sand Pointe Way, NE
+  l2: NMFS RACE Division, Groundfish Assessment Program
+  l3: Seattle, WA 98115
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, error = FALSE, message = FALSE)
+```
+
+State of Alaska Fish Resource Permit CF-22-022  
+
+NOAA National Marine Fisheries Service   
+Alaska Fisheries Science Center --   
+Resource Assessment and Conservation Engineering Division, Groundfish Assessment Program  
+Trawl Survey Contact: Ned.Laman@noaa.gov, Survey Team Lead
+
+
+# **Activity Title:**  
+RACE Groundfish Assessment Program Biennial Bottom Trawl Survey of `r region` Groundfish and Invertebrate Resources  
+
+# **Introduction:**  
+The Alaska Fisheries Science Center (AFSC) Resource Assessment and Conservation Engineering (RACE) Groundfish Assessment Program's (GAP) bottom trawl survey of the `r regionw_abbr` is conducted to monitor the distribution, abundance, and biological characteristics of multiple species of groundfishes and invertebrates in coastal and offshore Alaska waters. The survey collects catch per unit effort (CPUE) of key species and uses the CPUE to estimate relative biomass from a stratified-random survey design. Survey data are also used to characterize length and age distributions, growth, recruitment, stock structure, and other important life history information of key species to better understand the ecological and physical factors affecting their distribution and abundance. These data, estimates, and study results are provided to federal and state stock assessment biologists and to the Groundfish Plan Teams of the North Pacific Fishery Management Council (NPFMC) who use the information to determine productivity and to inform annual Allowable Biological Catch (ABC) and Total Allowable Catch (TAC) for groundfishes in the `r region_abbr`.  
+
+# **Methods:**  
+The AFSC GAP biennial bottom trawl survey of the `r region_abbr` typically deploys two chartered commercial trawlers to conduct the survey for `r ai_methods`. A grid of 5x5 km is superimposed on bathymetry maps with a grid cell representing the primary sampling unit. Stations determined to be untrawlable in previous surveys of the area are not considered when allocating survey stations to vessels. A Poly Nor’Eastern research net with roller gear is trawled on bottom at each station for up to 15 minutes. Trawl height and width are monitored with acoustic net mensuration gear; bottom contact is derived from an accelerometer on the trawl footrope; surface and bottom temperatures are collected using a bathythermograph attached to the headrope of the trawl. Catches are processed by identifying all animals collected to the highest possible taxonomic classification and weighing and counting each taxon. Additional samples are collected by measuring the length of selected species, collecting age structures, tissue samples, and stomach contents from selected specimens, saving voucher specimens for later identification and accessioning to museum collections. All data are preserved digitally and are subjected to multiple quality control checks.  
+
+# **Results:**
+Active fishing for the `r maxyr` `r region_abbr` bottom trawl survey occurred between `r dates_conducted` and was the `r survnumber`, standardized multi-species survey in the `r time_series` begun in `r series_begun`. GAP considers this to be the period of time during which the trawl gear and trawling methods are standardized across the time series in this region. Two charter vessels, the *`r vessel1`* and the *`r vessel2`*, conducted the summer survey and, combined, successfully trawled `r s_stations` out of `r t_stations` planned stations; `r u_hauls` of the `r a_hauls` trawls attempted were unsuccessful. A total of `r stations_3nm` trawls were attempted within Alaska state waters and collected `r fish_3nm` fish taxa weighing `r scales::comma(fish_3nm_wt)` kg (Table 1). From combined state and offshore waters, the survey collected `r fish_all` fish taxa weighing `r scales::comma(fish_all_wt)` kg in total (Table 2). There were `r inverts_3nm` invertebrate taxa collected from Alaska state waters with a total weight of `r scales::comma(inverts_3nm_wt)` kg (Table 1). In total, `r inverts_all` invertebrate taxa were collected from combined state and offshore waters with a total weight of `r scales::comma(inverts_all_wt)` kg (Table 2). The same 4 fish species comprise approximately 80% of the total catch weight both from combined state and offshore waters and from within Alaska state waters in `r maxyr`. Those species are Pacific ocean perch, Atka mackerel, northern rockfish and walleye pollock. In total, from all state and offshore waters sampled, the survey vouchered `r voucher_all_count` fish and invertebrate taxa and collected `r scales::comma(oto_all)` otoliths pairs from `r oto_taxa` fish species (Table 4). Of the `r voucher_all_count` vouchered taxa, `r fish_taxa_all_count` were fishes and the remaining `r invert_taxa_all_count` were invertebrates. Within Alaska state waters, `r voucher_3nm_count` specimens were vouchered, `r fish_taxa_count_3nm` were fishes and `r invert_taxa_count_3nm` were invertebrates, and `r scales::comma(oto_3nm)` otolith pairs were collected from `r oto_3nm_taxa` fish species (Table 3). Finalized and validated survey data were released on `r data_finalized`. Data products (biomass estimates, length composition, and age composition) were presented to the NPFMC's Joint Groundfish Plan Team during their annual September meeting. 
+
+Survey data products are available upon request through the GAP data request repository^[https://github.com/afsc-gap-products/data-requests] and have also been made available over the internet on the Alaska Fisheries Information Network (AKFIN^[https://akfin.psmfc.org/]) and the NMFS Fisheries One Stop Shop (FOSS^[https://www.fisheries.noaa.gov/foss/f?p=215:28]). 
+
+
+\newpage
+<!-- Catch Summary Table - Within 3-mile Territorial Waters -->
+```{r, catch-summary-table}
+library(here)
+catch_sum_3nm <- catch_state %>% 
+  separate(SPECIES_NAME, c("species", "species_suffix"),
+    sep = "(?= sp\\.)", extra = "merge", remove = FALSE
+  ) %>%
+  mutate(species_suffix = case_when(
+    stringr::str_count(species, "\\w+") == 1 & is.na(species_suffix) ~ species,
+    TRUE ~ species_suffix
+  )) %>%
+  separate(species, c("species_2", "egg_case"), sep = "(?=egg case)", remove = TRUE) %>%
+  mutate(new_suffix = coalesce(species_suffix, egg_case)) %>%
+  dplyr::select(-species_suffix, -egg_case)
+
+# Round total counts and format with commas
+catch_sum_3nm$TOTAL_COUNT_STATE <- format(round(catch_sum_3nm$TOTAL_COUNT_STATE), big.mark = ",")
+catch_sum_3nm$TOTAL_COUNT_STATE[which(catch_sum_3nm$TOTAL_COUNT_STATE == "     0")] <- "--"
+catch_sum_3nm$TOTAL_COUNT_STATE[which(catch_sum_3nm$SPECIES_CODE %in% dashes_lookup$species_code)] <- "--" #no counts for certain taxa
+
+# Round total weight and format with commas
+# catch_sum_3nm$TOTAL_WEIGHT_KG_STATE <- format(round(catch_sum_3nm$TOTAL_WEIGHT_KG_STATE, digits = 2), big.mark = ",")
+# catch_sum_3nm$TOTAL_WEIGHT_KG_STATE[catch_sum_3nm$TOTAL_WEIGHT_KG_STATE < 0.01] <- "< 0.01"
+
+catch_sum_3nm$TOTAL_WEIGHT_KG_STATE_CHR <- NA # add a column
+catch_sum_3nm$TOTAL_WEIGHT_KG_STATE_CHR <- format(round(catch_sum_3nm$TOTAL_WEIGHT_KG_STATE, digits = 2), big.mark = ",")
+catch_sum_3nm$TOTAL_WEIGHT_KG_STATE_CHR[catch_sum_3nm$TOTAL_WEIGHT_KG_STATE < 0.01] <- "< 0.01"
+
+# catch_sum_3nm$TOTAL_WEIGHT_KG_STATE[catch_sum_3nm$TOTAL_WEIGHT_KG_STATE < 0.01] <- "< 0.01"
+# catch_sum_3nm$TOTAL_WEIGHT_KG_STATE[catch_sum_3nm$TOTAL_WEIGHT_KG_STATE >= 0.01] <- format(round(catch_sum_3nm$TOTAL_WEIGHT_KG_STATE[catch_sum_3nm$TOTAL_WEIGHT_KG_STATE >= 0.01], digits = 2), big.mark = ",")
+
+
+for (i in 1:nrow(catch_sum_3nm)) {
+  if (!is.na(catch_sum_3nm$new_suffix[i])) {
+    if (catch_sum_3nm$species_2[i] == catch_sum_3nm$new_suffix[i]) {
+      catch_sum_3nm$species_2[i] <- ""
+    }
+  }
+}
+
+flextable::flextable(catch_sum_3nm, col_keys = c("COMMON_NAME", "dummy_col", "TOTAL_WEIGHT_KG_STATE_CHR", "TOTAL_COUNT_STATE")) %>% 
+  flextable::mk_par(j = "dummy_col",
+    value = as_paragraph(
+      as_i(species_2),
+      "", new_suffix
+  )) %>%
+  flextable::add_header_lines("Table 1. 2025 Catch summary table - totals within 3-mile territorial waters (Alaska state waters); \"--\" indicates cases where counts are not typically recorded (e.g., colonial organisms or species that are easily damaged or fragmented in the catch).", top = TRUE) %>%
+  flextable::font(fontname = "Times New Roman", part = "all") %>%
+  flextable::fontsize(size = 12, part = "all") %>%
+  flextable::theme_vanilla() %>%
+  flextable::set_header_labels(
+    COMMON_NAME = "Common name",
+    dummy_col = "Scientific name",
+    TOTAL_WEIGHT_KG_STATE_CHR = "Weight in kg",
+    TOTAL_COUNT_STATE = "Number of individuals"
+  )%>%
+  flextable::width(width = 2.2, j = 1:1) %>%
+  flextable::width(width = 2.7, j = 2:2) %>%
+  flextable::width(width = 1.0, j = 3:4) %>%
+  flextable::align(align = "right", j = 3:4, part = "all") %>%
+  flextable::align(align = "left", j = 1:2, part = "all") 
+```
+
+
+\newpage
+
+<!-- **r maxyr** Catch Summary Table -- Totals for Survey (including state waters) -->
+
+```{r, catch-summary-table2}
+library(here)
+catch_sum_all <- catch_total %>% 
+  separate(SPECIES_NAME, c("species", "species_suffix"),
+    sep = "(?= sp\\.)", extra = "merge", remove = FALSE
+  ) %>%
+  mutate(species_suffix = case_when(
+    stringr::str_count(species, "\\w+") == 1 & is.na(species_suffix) ~ species,
+    TRUE ~ species_suffix
+  )) %>%
+  separate(species, c("species_2", "egg_case"), sep = "(?=egg case)", remove = TRUE) %>%
+  mutate(new_suffix = coalesce(species_suffix, egg_case)) %>%
+  dplyr::select(-species_suffix, -egg_case)
+
+# Round total counts and format with commas
+catch_sum_all$TOTAL_COUNT <-  format(round(catch_sum_all$TOTAL_COUNT), big.mark = ",")  
+catch_sum_all$TOTAL_COUNT[which(catch_sum_all$TOTAL_COUNT=="      0")] <- "--"
+catch_sum_all$TOTAL_COUNT[which(catch_sum_all$SPECIES_CODE %in% dashes_lookup$species_code)] <- "--" #no counts for certain taxa
+
+# Round total weight and format with commas
+# catch_sum_all$total_weight_kg_txt <-  format(round(catch_sum_all$total_weight_kg,digits = 2), big.mark = ",")
+# catch_sum_all$total_weight_kg_txt[catch_sum_all$total_weight_kg < 0.01] <- "< 0.01"
+
+catch_sum_all$TOTAL_WEIGHT_KG_CHR <- NA # add a column
+catch_sum_all$TOTAL_WEIGHT_KG_CHR <- format(round(catch_sum_all$TOTAL_WEIGHT_KG, digits = 2), big.mark = ",")
+catch_sum_all$TOTAL_WEIGHT_KG_CHR[catch_sum_3nm$TOTAL_WEIGHT_KG < 0.01] <- "< 0.01"
+
+for (i in 1:nrow(catch_sum_all)) {
+  if (!is.na(catch_sum_all$new_suffix[i])) {
+    if (catch_sum_all$species_2[i] == catch_sum_all$new_suffix[i]) {
+      catch_sum_all$species_2[i] <- ""
+    }
+  }
+}
+
+
+flextable::flextable(catch_sum_all, col_keys = c("COMMON_NAME", "dummy_col", "TOTAL_WEIGHT_KG", "TOTAL_COUNT")) %>% 
+  flextable::mk_par(j = "dummy_col",
+    value = as_paragraph(
+      as_i(species_2),
+      "", new_suffix
+  )) %>% 
+  flextable::add_header_lines("Table 2. 2025 Catch summary table - totals for survey (including state waters); \"--\" indicates cases where counts are not typically recorded (e.g., colonial organisms or species that are easily damaged or fragmented in the catch).", top = TRUE) %>%
+  flextable::font(fontname = "Times New Roman", part = "all") %>%
+  flextable::fontsize(size = 12, part = "all") %>%
+  flextable::theme_vanilla() %>%
+  flextable::set_header_labels(
+    COMMON_NAME = "Common name",
+    dummy_col = "Scientific name",
+    TOTAL_WEIGHT_KG = "Weight in kg",
+    TOTAL_COUNT = "Number of individuals"
+  ) %>%
+  flextable::width(width = 2.2, j = 1:1) %>%
+  flextable::width(width = 2.7, j = 2:2) %>%
+  flextable::width(width = 1.0, j = 3:4) %>%
+  flextable::align(align = "left", j = 1:2, part = "all") %>%
+  flextable::align(align = "right", j = 3:4, part = "all")
+```
+
+
+
+\newpage
+
+<!-- **r maxyr** Voucher or Collection Specimens from Alaska State Waters  -->
+
+```{r, voucher-collection}
+library(here)
+voucher_3nm <- specimens_state %>%
+  separate(SPECIES_NAME, c("species", "species_suffix"),
+           sep = "(?= sp\\.)", extra = "merge", remove = FALSE
+  ) %>%
+  mutate(species_suffix = case_when(
+    stringr::str_count(species, "\\w+") == 1 & is.na(species_suffix) ~ species,
+    TRUE ~ species_suffix
+  )) %>%
+  separate(species, c("species_2", "egg_case"), sep = "(?=egg case)", remove = TRUE) %>%
+  mutate(new_suffix = coalesce(species_suffix, egg_case)) %>%
+  dplyr::select(-species_suffix, -egg_case)
+
+for (i in 1:nrow(voucher_3nm)) {
+  if (!is.na(voucher_3nm$new_suffix[i])) {
+    if (voucher_3nm$species_2[i] == voucher_3nm$new_suffix[i]) {
+      voucher_3nm$species_2[i] <- ""
+    }
+  }
+}
+
+flextable::flextable(voucher_3nm, col_keys = c("COMMON_NAME", "dummy_col", "N_RECORDS_STATE", "SAMPLE_TYPE")) %>% 
+  flextable::mk_par(j = "dummy_col",
+    value = as_paragraph(
+      as_i(species_2),
+      "", new_suffix
+  ))  %>%
+  flextable::add_header_lines("Table 3. 2025 Voucher or specimen collection within Alaska state waters", top = TRUE)  %>%
+  flextable::font(fontname = "Times New Roman", part = "all") %>%
+  flextable::fontsize(size = 12, part = "all") %>%
+  flextable::theme_vanilla() %>%
+  flextable::set_header_labels(
+    COMMON_NAME = "Common name",
+    dummy_col = "Scientific name",
+    N_RECORDS_STATE = "Record count",
+    SAMPLE_TYPE = "Collection type"
+  ) %>%
+  flextable::width(width = 1.1, j = 3:4) %>%
+  flextable::width(width = 2.4, j = 1:2) %>%
+  flextable::align(align = "right", j = 3:4, part = "all") %>%
+  flextable::align(align = "left", j = 1:2, part = "all")
+```
+
+
+\newpage
+
+<!-- **r maxyr** Voucher or Collection Specimens from All Waters --> 
+
+```{r, voucher-all}
+library(here)
+voucher_all <- #specimens_total %>%
+  separate(species_name, c("species", "species_suffix"),
+           sep = "(?= sp\\.)", extra = "merge", remove = FALSE
+  ) %>%
+  mutate(species_suffix = case_when(
+    stringr::str_count(species, "\\w+") == 1 & is.na(species_suffix) ~ species,
+    TRUE ~ species_suffix
+  )) %>%
+  separate(species, c("species_2", "egg_case"), sep = "(?=egg case)", remove = TRUE) %>%
+  mutate(new_suffix = coalesce(species_suffix, egg_case)) %>%
+  dplyr::select(-species_suffix, -egg_case)
+
+for (i in 1:nrow(voucher_all)) {
+  if (!is.na(voucher_all$new_suffix[i])) {
+    if (voucher_all$species_2[i] == voucher_all$new_suffix[i]) {
+      voucher_all$species_2[i] <- ""
+    }
+  }
+}
+
+#library(tidyverse)
+#voucher_all_srvy %>% mutate_if(is.numeric, str_replace_all, pattern = "0", replacement = " ")
+
+flextable::flextable(voucher_all, col_keys = c("COMMON_NAME", "dummy_col", "N_RECORDS_TOTAL", "SAMPLE_TYPE")) %>% 
+  flextable::mk_par(j = "dummy_col",
+    value = as_paragraph(
+      as_i(species_2),
+      "", new_suffix
+  )) %>%
+  flextable::add_header_lines("Table 4. 2025 Voucher or specimen collection for both state and offshore waters", top = TRUE) %>%
+  flextable::font(fontname = "Times New Roman", part = "all") %>%
+  flextable::fontsize(size = 12, part = "all") %>%
+  flextable::theme_vanilla() %>%
+  flextable::set_header_labels(
+    COMMON_NAME = "Common name",
+    dummy_col = "Scientific name",
+    N_RECORDS_TOTAL = "Record count",
+    SAMPLE_TYPE = "Collection type"
+  ) %>%
+  flextable::width(width = 1.1, j = 3:4) %>%
+  flextable::width(width = 2.4, j = 1:2) %>%
+  flextable::align(align = "right", j = 3:4, part = "all") %>%
+  flextable::align(align = "left", j = 1:2, part = "all")
+```
