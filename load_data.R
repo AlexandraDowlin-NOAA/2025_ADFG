@@ -27,7 +27,7 @@ for (i in 1:length(locations)) {
   print(locations[i])
   filename <- tolower(gsub("\\.", "-", locations[i]))
   a <- RODBC::sqlQuery(channel, paste0("SELECT * FROM ", locations[i]))
-  write_csv(
+  readr::write_csv(
     x = a,
     here::here("data", "oracle", paste0(filename, ".csv"))
   )
@@ -42,12 +42,12 @@ a <- list.files(
 )
 
 for (i in 1:length(a)) {
-  b <- read_csv(file = here::here("data", "oracle", a[i]))
+  b <- readr::read_csv(file = here::here("data", "oracle", a[i]))
   b <- janitor::clean_names(b)
   if (names(b)[1] %in% "x1") {
     b$x1 <- NULL
   }
-  assign(x = paste0(str_extract(a[i], "[^-]*(?=\\.)"), "0"), value = b)
+  assign(x = paste0(stringr::str_extract(a[i], "[^-]*(?=\\.)"), "0"), value = b)
   rm(b)
 }
 
