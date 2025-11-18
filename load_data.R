@@ -69,10 +69,22 @@ specimens_state <- read.csv("assets/adfg_report/goa_202501_adfg_specimens_state.
 specimens_total <- read.csv("assets/adfg_report/goa_202501_adfg_specimens_total.csv")
 
 
-
 # summary tables -----------------------------------------------------------
-#### used for 2024, 2023 adfg report. Switched to using navmaps and gap.products
+# Load tables made in 'data_analysis.R'
+catch_summary_3nm <- readr::read_csv(here::here("output", tolower(region_abbr), 
+                                                paste0(tolower(region_abbr), "_", cruise_id,"_adfg_catch_state.csv")))
+catch_summary <- readr::read_csv(here::here("output", tolower(region_abbr), 
+                                                paste0(tolower(region_abbr), "_", cruise_id,"_adfg_catch_total.csv")))
 
+age_count_3nm <- readr::read_csv(here::here("output", tolower(region_abbr), 
+                                            paste0(tolower(region_abbr), "_", cruise_id,"_adfg_specimens_state.csv")))
+age_count <- readr::read_csv(here::here("output", tolower(region_abbr), 
+                                            paste0(tolower(region_abbr), "_", cruise_id,"_adfg_specimens_total.csv")))
+
+
+
+# Old catch_summary and age_count tables ----------------------------------
+#### used for 2024, 2023 adfg report. Switched to using navmaps and gap.products
 # catch_summary_3nm <- catch0 %>%
 #   dplyr::select(number_fish, weight, hauljoin, cruisejoin, cruise, region, species_code) %>%
 #   dplyr::left_join(haul0 %>% dplyr::select(hauljoin, cruisejoin, stationid, stratum, abundance_haul)) %>%
@@ -91,9 +103,6 @@ specimens_total <- read.csv("assets/adfg_report/goa_202501_adfg_specimens_total.
 #   dplyr::left_join(species0) %>%
 #   dplyr::select(species_code, common_name, species_name, total_weight_kg, total_count)
 
-
-# catch summary ----------------------------------------------------------------
-
 # catch_summary <- catch0 %>%
 #   dplyr::filter(region == SRVY &
 #                   cruise == cruise1) %>%
@@ -108,9 +117,6 @@ specimens_total <- read.csv("assets/adfg_report/goa_202501_adfg_specimens_total.
 #   dplyr::left_join(species0) %>%
 #   dplyr::select(species_code, common_name, species_name, total_weight_kg, total_count)
 
-
-
-# voucher summary 3 nm ---------------------------------------------------------
 # counts of age samples
 # age_count_3nm <- specimen0 %>%
 #   dplyr::left_join(haul0 %>% dplyr::select(hauljoin, stationid, stratum, abundance_haul)) %>%
@@ -125,7 +131,19 @@ specimens_total <- read.csv("assets/adfg_report/goa_202501_adfg_specimens_total.
 #   dplyr::group_by(species_code) %>%
 #   dplyr::summarise(count = n()) %>%
 #   dplyr::mutate(comment = "Age Sample")
+# counts of age samples
+#
+# age_count <- specimen0 %>%
+#   dplyr::left_join(haul0 %>% dplyr::select(hauljoin, abundance_haul)) %>%
+#   # dplyr::filter(abundance_haul == "Y") %>%
+#   dplyr::filter(region == SRVY &
+#                   cruise == cruise1 &
+#                   specimen_sample_type == 1) %>%
+#   dplyr::group_by(species_code) %>%
+#   dplyr::summarise(count = n()) %>%
+#   dplyr::mutate(comment = "Age Sample")
 
+# Voucher counts ----------------------------------------------------------
 # counts of vouchers
 voucher_count_3nm <- catch0 %>%
   dplyr::left_join(haul0 %>% dplyr::select(hauljoin, stationid, stratum, abundance_haul)) %>%
@@ -149,17 +167,6 @@ voucher_3nm <- dplyr::bind_rows(voucher_count_3nm, specimens_state) %>%
 
 
 # voucher summary  -------------------------------------------------------------
-# counts of age samples
-# age_count <- specimen0 %>%
-#   dplyr::left_join(haul0 %>% dplyr::select(hauljoin, abundance_haul)) %>%
-#   # dplyr::filter(abundance_haul == "Y") %>%
-#   dplyr::filter(region == SRVY &
-#                   cruise == cruise1 &
-#                   specimen_sample_type == 1) %>%
-#   dplyr::group_by(species_code) %>%
-#   dplyr::summarise(count = n()) %>%
-#   dplyr::mutate(comment = "Age Sample")
-
 # counts of vouchers for all survey
 voucher_count <- catch0 %>%
   dplyr::left_join(haul0 %>% dplyr::select(hauljoin, abundance_haul)) %>%
