@@ -347,18 +347,18 @@ for(ii in 1:length(software_types)) {
 
 
 # Move files from navmaps to G:/RACE_CHARTS/
-file.copy(from = here::here("output", region, "navigation"),
-          to = paste0("G:/RACE_CHARTS/", region),
-          recursive = TRUE)
-
-file.copy(from = here::here("output", region, "shapefiles"),
-          to = paste0("G:/RACE_CHARTS/", region),
-          recursive = TRUE)
-
-file.copy(from = here::here("output", region, "gps"),
-          to = paste0("G:/RACE_CHARTS/", region),
-          recursive = TRUE)
-
-file.copy(from = here::here("assets", "data", "SSLrookeries"),
-          to = paste0("G:/RACE_CHARTS/", region, "/shapefiles/"),
-          recursive = TRUE)
+# file.copy(from = here::here("output", region, "navigation"),
+#           to = paste0("G:/RACE_CHARTS/", region),
+#           recursive = TRUE)
+# 
+# file.copy(from = here::here("output", region, "shapefiles"),
+#           to = paste0("G:/RACE_CHARTS/", region),
+#           recursive = TRUE)
+# 
+# file.copy(from = here::here("output", region, "gps"),
+#           to = paste0("G:/RACE_CHARTS/", region),
+#           recursive = TRUE)
+# 
+# file.copy(from = here::here("assets", "data", "SSLrookeries"),
+#           to = paste0("G:/RACE_CHARTS/", region, "/shapefiles/"),
+#           recursive = TRUE)
