@@ -54,7 +54,7 @@ for (i in 1:length(a)) {
 }
 
 
-# UPDATE below depending on srvy and yr -----------------------------------------
+# UPDATE below depending on srvy and yr ----------------------------------------
 # SRVY calls region and cruise1 calls cruise. Write the code like this means not having to touch the code at all.
 SRVY <- "GOA"
 cruise1 <- 202501
@@ -64,7 +64,7 @@ cruise1 <- 202501
 
 
 
-# data tables needed for report  ------------------------------------------------
+# data tables from Sean code needed for report  --------------------------------
 catch_state <- read.csv("assets/adfg_report/goa_202501_adfg_catch_state.csv")
 catch_total <- read.csv("assets/adfg_report/goa_202501_adfg_catch_total.csv")
 specimens_state <- read.csv("assets/adfg_report/goa_202501_adfg_specimens_state.csv")
