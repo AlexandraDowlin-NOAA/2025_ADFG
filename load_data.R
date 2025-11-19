@@ -1,5 +1,5 @@
-# data tables needed for report  ------------------------------------------------
-## Download data sets to local machine -------------------------------------------------------
+# data tables needed for report  -----------------------------------------------
+## Download data sets to local machine -----------------------------------------
 
 # RACEBASE tables to query
 locations <- c(
@@ -14,7 +14,7 @@ locations <- c(
   "RACE_DATA.RACE_SPECIES_CODES",
   # "RACE_DATA.CRUISES",
   "RACE_DATA.V_CRUISES",
-  "GOA.STATIONS_3NM"
+  # "GOA.STATIONS_3NM" #MCS : commenting this out because we don't want to use this station list anymore-- we should use the station list from the shapefile analysis.
   # "AI.STATIONS_3NM" hashtag out depending on what year your are reporting, maybe create IF ELSE statement
 )
 
@@ -63,15 +63,8 @@ cruise1 <- 202501
 # cruise1 <- 202201
 
 
-
-# data tables from Sean code needed for report  --------------------------------
-catch_state <- read.csv("assets/adfg_report/goa_202501_adfg_catch_state.csv")
-catch_total <- read.csv("assets/adfg_report/goa_202501_adfg_catch_total.csv")
-specimens_state <- read.csv("assets/adfg_report/goa_202501_adfg_specimens_state.csv")
-specimens_total <- read.csv("assets/adfg_report/goa_202501_adfg_specimens_total.csv")
-
-
 # summary tables -----------------------------------------------------------
+# data tables from Sean code needed for report
 # Load tables made in 'data_analysis.R'
 catch_summary_3nm <- readr::read_csv(here::here(
   "output", tolower(region_abbr),
@@ -93,25 +86,29 @@ age_count <- readr::read_csv(here::here(
 
 
 # Voucher counts ----------------------------------------------------------
-# counts of vouchers
-voucher_count_3nm <- catch0 %>%
-  dplyr::left_join(haul0 %>% dplyr::select(hauljoin, stationid, stratum, abundance_haul)) %>%
-  # dplyr::filter(abundance_haul == "Y") %>%
-  # dplyr::inner_join(stations_3nm0 %>%
-  #                     dplyr::select(stationid, stratum) %>%
-  #                     dplyr::distinct()) %>%
+# counts of vouchers (MCS: need to confirm! does this look like a reasonable # of vouchers in state waters?)
+voucher_count_3nm <- catch0 |>
+  dplyr::left_join(haul0 %>% dplyr::select(hauljoin, stationid, stratum, abundance_haul)) |>
   dplyr::filter(region == SRVY &
-    stationid %in% stations_3nm0$stationid &
+    # stationid %in% stations_3nm0$stationid &
     cruise == cruise1 &
-    !is.na(voucher)) %>%
-  dplyr::group_by(species_code) %>%
-  dplyr::summarise(count = n()) %>%
-  dplyr::mutate(comment = "Voucher")
+    !is.na(voucher)) |>
+  dplyr::right_join(state_hauls, by = c('cruise'='CRUISE','vessel'='VESSEL','haul'='HAUL')) |> # keep only stuff in state hauls
+  dplyr::filter(!is.na(species_code)) |> # remove entries that aren't in state_hauls
+  dplyr::group_by(species_code) |>
+  dplyr::summarise(count = n()) |>
+  dplyr::left_join(species0) |> # add common names and species names
+  dplyr::mutate(SAMPLE_TYPE = "Voucher") |>
+  dplyr::rename(SPECIES_CODE = "species_code",
+                SPECIES_NAME = "species_name",
+                COMMON_NAME = "common_name",
+                N_RECORDS_STATE = "count"
+                ) 
+ 
 
 # combine and stack vouchers and age samples
-voucher_3nm <- dplyr::bind_rows(voucher_count_3nm, specimens_state) %>%
-  dplyr::left_join(species0) %>%
-  dplyr::select(common_name, species_name, count, comment)
+voucher_3nm <- dplyr::bind_rows(voucher_count_3nm, age_count_3nm) %>%
+  dplyr::select(COMMON_NAME, SPECIES_NAME, N_RECORDS_STATE, SAMPLE_TYPE)
 
 
 
