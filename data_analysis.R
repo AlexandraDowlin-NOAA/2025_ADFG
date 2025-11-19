@@ -53,13 +53,13 @@ u_hauls <- haul0 %>%
 # MCS note: this one is the same. If you filter the sql script to be haul_type = 3 you'll get the same number as in R. I'm not sure which is better, but 24 is the number I have in my report, so I'd say we should stick to that one.
 
 # stations within 3nm #123
-stations_3nm <- haul0 %>%
-  filter(abundance_haul == "Y") %>%
-  filter(cruise == cruise_id) %>%
-  filter(region == region_abbr) %>%
-  distinct(stationid, stratum) %>%
-  inner_join(stations_3nm0) %>%
-  nrow()
+# stations_3nm <- haul0 %>%
+#   filter(abundance_haul == "Y") %>%
+#   filter(cruise == cruise_id) %>%
+#   filter(region == region_abbr) %>%
+#   distinct(stationid, stratum) %>%
+#   inner_join(stations_3nm0) %>%
+#   nrow()
 
 
 
