@@ -85,8 +85,8 @@ age_count <- readr::read_csv(here::here(
 ))
 
 
-# Voucher counts ----------------------------------------------------------
-# counts of vouchers (MCS: need to confirm! does this look like a reasonable # of vouchers in state waters?)
+# Voucher summary 3nm ----------------------------------------------------------
+# MCS: need to confirm! does this look like a reasonable # of vouchers in state waters?
 voucher_count_3nm <- catch0 |>
   dplyr::left_join(haul0 %>% dplyr::select(hauljoin, stationid, stratum, abundance_haul)) |>
   dplyr::filter(region == SRVY &
@@ -111,36 +111,25 @@ voucher_3nm <- dplyr::bind_rows(voucher_count_3nm, age_count_3nm) %>%
   dplyr::select(COMMON_NAME, SPECIES_NAME, N_RECORDS_STATE, SAMPLE_TYPE)
 
 
-
-# voucher summary  -------------------------------------------------------------
+# voucher summary all survey  --------------------------------------------------
 # counts of vouchers for all survey
-voucher_count <- catch0 %>%
-  dplyr::left_join(haul0 %>% dplyr::select(hauljoin, abundance_haul)) %>%
-  # dplyr::filter(abundance_haul == "Y") %>%
+voucher_count <- catch0 |>
+  dplyr::left_join(haul0 %>% dplyr::select(hauljoin, abundance_haul)) |>
   dplyr::filter(region == SRVY &
     cruise == cruise1 &
-    !is.na(voucher)) %>%
-  dplyr::group_by(species_code) %>%
-  dplyr::summarise(count = n()) %>%
-  dplyr::mutate(comment = "Voucher")
+    !is.na(voucher)) |>
+  dplyr::group_by(species_code) |>
+  dplyr::summarise(count = n()) |>
+  dplyr::left_join(species0) |>
+  dplyr::mutate(SAMPLE_TYPE = "Voucher") |>
+  dplyr::rename(SPECIES_CODE = species_code,
+                COMMON_NAME = common_name,
+                SPECIES_NAME = species_name,
+                N_RECORDS_TOTAL = count)
 
 # find out how to put together the new specimen table with the above voucher
-voucher_all <- dplyr::bind_rows(voucher_count, specimens_total) %>%
-  dplyr::left_join(species0) %>%
-  dplyr::select(common_name, species_name, count, comment)
-
-# voucher_count <- catch0 %>%
-#   dplyr::filter(region == SRVY &
-#                   cruise == cruise1 &
-#                   !is.na(voucher)) %>%
-#   dplyr::group_by(species_code) %>%
-#   dplyr::summarise(count = sum(number_fish, na.rm=T)) %>%
-#   dplyr::mutate(comment  = "Voucher")
-
-# combine and stack vouchers and age samples
-voucher_all <- dplyr::bind_rows(voucher_count, age_count) %>%
-  dplyr::left_join(species0) %>%
-  dplyr::select(common_name, species_name, count, comment)
+voucher_all <- dplyr::bind_rows(voucher_count, age_count) |>
+  dplyr::select(COMMON_NAME, SPECIES_NAME, N_RECORDS_TOTAL, SAMPLE_TYPE)
 
 
 # Old catch_summary and age_count tables ----------------------------------
