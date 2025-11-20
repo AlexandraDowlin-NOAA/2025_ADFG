@@ -65,90 +65,90 @@ u_hauls <- haul0 %>%
 
 ## good up to here
 # total count of fish taxa encounter within 3nm
-fish_3nm <- catch_summary_3nm %>%
+fish_3nm <- catch_state |>
   dplyr::mutate(taxon = dplyr::case_when(
-    species_code <= 31550 ~ "fish",
-    species_code >= 40001 ~ "invert"
+    SPECIES_CODE <= 31550 ~ "fish",
+    SPECIES_CODE >= 40001 ~ "invert"
   )) %>%
-  filter(taxon == "fish") %>%
+  filter(taxon == "fish") |>
   nrow()
 
 
 # total weight of fish taxa encountered within 3nm
-fish_3nm_wt <- catch_summary_3nm %>%
+fish_3nm_wt <- catch_state %>%
   dplyr::mutate(taxon = dplyr::case_when(
-    species_code <= 31550 ~ "fish",
-    species_code >= 40001 ~ "invert"
+    SPECIES_CODE <= 31550 ~ "fish",
+    SPECIES_CODE >= 40001 ~ "invert"
   )) %>%
   filter(taxon == "fish") %>%
-  mutate(total_weight_kg = as.numeric(total_weight_kg)) %>%
-  summarize(total = sum(total_weight_kg)) %>%
+  mutate(total_weight_kg = as.numeric(TOTAL_WEIGHT_KG_STATE )) %>%
+  summarize(total = sum(TOTAL_WEIGHT_KG_STATE )) %>%
   as.numeric()
 
 
 # total count of fish taxa encountered in all survey
-fish_all <- catch_summary %>%
+fish_all <- catch_total %>%
   dplyr::mutate(taxon = dplyr::case_when(
-    species_code <= 31550 ~ "fish",
-    species_code >= 40001 ~ "invert"
+    SPECIES_CODE <= 31550 ~ "fish",
+    SPECIES_CODE >= 40001 ~ "invert"
   )) %>%
   filter(taxon == "fish") %>%
   nrow()
 
 
 # total weight of fish taxa encountered in all survey
-fish_all_wt <- catch_summary %>%
+fish_all_wt <- catch_total %>%
   dplyr::mutate(taxon = dplyr::case_when(
-    species_code <= 31550 ~ "fish",
-    species_code >= 40001 ~ "invert"
+    SPECIES_CODE <= 31550 ~ "fish",
+    SPECIES_CODE >= 40001 ~ "invert"
   )) %>%
   filter(taxon == "fish") %>%
-  mutate(total_weight_kg = as.numeric(total_weight_kg)) %>%
-  summarize(total = sum(total_weight_kg)) %>%
+  mutate(total_weight_kg = as.numeric(TOTAL_WEIGHT_KG )) %>%
+  summarize(total = sum(TOTAL_WEIGHT_KG)) %>%
   as.numeric()
 
 
 # total count of invert taxa within 3nm
-inverts_3nm <- catch_summary_3nm %>%
+inverts_3nm <- catch_state %>%
   dplyr::mutate(taxon = dplyr::case_when(
-    species_code <= 31550 ~ "fish",
-    species_code >= 40001 ~ "invert"
+    SPECIES_CODE <= 31550 ~ "fish",
+    SPECIES_CODE >= 40001 ~ "invert"
   )) %>%
   filter(taxon == "invert") %>%
   nrow()
 
 
 # total weight of invert taxa within 3nm
-inverts_3nm_wt <- catch_summary_3nm %>%
+inverts_3nm_wt <- catch_state %>%
   dplyr::mutate(taxon = dplyr::case_when(
-    species_code <= 31550 ~ "fish",
-    species_code >= 40001 ~ "invert"
+    SPECIES_CODE <= 31550 ~ "fish",
+    SPECIES_CODE >= 40001 ~ "invert"
   )) %>%
   filter(taxon == "invert") %>%
-  mutate(total_weight_kg = as.numeric(total_weight_kg)) %>%
-  summarize(total = sum(total_weight_kg)) %>%
+  mutate(total_weight_kg = as.numeric(TOTAL_WEIGHT_KG_STATE)) %>%
+  summarize(total = sum(TOTAL_WEIGHT_KG_STATE)) %>%
   as.numeric()
 
 
 # total count of invert taxa in all survey
-inverts_all <- catch_summary %>%
+inverts_all <- catch_total %>%
   dplyr::mutate(taxon = dplyr::case_when(
-    species_code <= 31550 ~ "fish",
-    species_code >= 40001 ~ "invert"
+    SPECIES_CODE <= 31550 ~ "fish",
+    SPECIES_CODE >= 40001 ~ "invert"
   )) %>%
   filter(taxon == "invert") %>%
   nrow()
 
 
 # total weight of invert taxa in all survey
-inverts_all_wt <- catch_summary %>%
+inverts_all_wt <- catch_total %>%
   dplyr::mutate(taxon = dplyr::case_when(
-    species_code <= 31550 ~ "fish",
-    species_code >= 40001 ~ "invert"
+    SPECIES_CODE <= 31550 ~ "fish",
+    SPECIES_CODE >= 40001 ~ "invert"
   )) %>%
   filter(taxon == "invert") %>%
-  mutate(total_weight_kg = as.numeric(total_weight_kg)) %>%
-  summarize(total = sum(total_weight_kg)) %>%
+  mutate(total_weight_kg = as.numeric(TOTAL_WEIGHT_KG)) %>%
+  summarize(total = sum(TOTAL_WEIGHT_KG)) %>%
   as.numeric()
 
 
