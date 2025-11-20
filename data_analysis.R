@@ -53,13 +53,13 @@ u_hauls <- haul0 %>%
 # MCS note: this one is the same. If you filter the sql script to be haul_type = 3 you'll get the same number as in R. I'm not sure which is better, but 24 is the number I have in my report, so I'd say we should stick to that one.
 
 # stations within 3nm #123
-# stations_3nm <- haul0 %>%
-#   filter(abundance_haul == "Y") %>%
-#   filter(cruise == cruise_id) %>%
-#   filter(region == region_abbr) %>%
-#   distinct(stationid, stratum) %>%
-#   inner_join(stations_3nm0) %>%
-#   nrow()
+stations_3nm <- haul0  |>
+  filter(abundance_haul == "Y")  |>
+  filter(cruise == cruise_id)  |>
+  filter(region == region_abbr)  |>
+  inner_join(state_hauls, by = c('haul'='HAUL','vessel'='VESSEL', 'cruise' = 'CRUISE'))  |>
+  distinct(stationid, stratum) |>
+  nrow()
 
 
 
@@ -175,20 +175,19 @@ oto_taxa <- voucher_all %>%
 # total count of all survey otoliths collected
 oto_all <- voucher_all %>%
   filter(SAMPLE_TYPE == "Otoliths") %>%
-  mutate(N_RECORDS_TOTAL = as.numeric(N_RECORDS_TOTAL)) %>%
   summarize(total = sum(N_RECORDS_TOTAL)) %>%
   as.numeric()
 
 # total count of otoliths collected from within 3nm
-oto_3nm <- voucher_3nm %>%
+oto_3nm <- voucher_age_3nm %>%
   filter(SAMPLE_TYPE == "Otoliths") %>%
   mutate(N_RECORDS_STATE = as.numeric(N_RECORDS_STATE)) %>%
   summarize(total = sum(N_RECORDS_STATE)) %>%
   as.numeric()
 
 # total count of taxa otoliths were collected from within 3nm
-oto_3nm_taxa <- voucher_3nm %>%
-  filter(comment == "Age Sample") %>%
+oto_3nm_taxa <- voucher_age_3nm %>%
+  filter(SAMPLE_TYPE == "Otoliths") %>%
   nrow()
 
 
@@ -196,16 +195,14 @@ data_finalized <- "13 September, 2023"
 
 
 # Total catch
-total_wt_all_catch <- catch_summary %>%
-  dplyr::mutate(total_weight_kg = as.numeric(total_weight_kg)) %>%
-  summarize(total = sum(total_weight_kg)) %>%
+total_wt_all_catch <- catch_total %>%
+  summarize(total = sum(TOTAL_WEIGHT_KG )) %>%
   as.numeric()
 total_wt_all_80 <- total_wt_all_catch * 0.8
 
 
 # Total 3nm catch
-total_wt_3nm_catch <- catch_summary_3nm %>%
-  dplyr::mutate(total_weight_kg = as.numeric(total_weight_kg)) %>%
-  summarize(total = sum(total_weight_kg)) %>%
+total_wt_3nm_catch <- catch_state %>%
+  summarize(total = sum(TOTAL_WEIGHT_KG_STATE )) %>%
   as.numeric()
 total_wt_3nm_80 <- total_wt_3nm_catch * 0.8
