@@ -51,4 +51,3 @@ age_count <- readr::read_csv(here::here(
 
 # Table of hauls within 3 nm ----------------------------------------------
 state_hauls <- read.csv("output/goa/goa_202501_state_hauls.csv")
-

@@ -55,11 +55,11 @@ u_hauls <- haul0 %>%
 # MCS note: this one is the same. If you filter the sql script to be haul_type = 3 you'll get the same number as in R. I'm not sure which is better, but 24 is the number I have in my report, so I'd say we should stick to that one.
 
 # stations within 3nm #123
-stations_3nm <- haul0  |>
-  filter(abundance_haul == "Y")  |>
-  filter(cruise == cruise_id)  |>
-  filter(region == region_abbr)  |>
-  inner_join(state_hauls, by = c('haul'='HAUL','vessel'='VESSEL', 'cruise' = 'CRUISE'))  |>
+stations_3nm <- haul0 |>
+  filter(abundance_haul == "Y") |>
+  filter(cruise == cruise_id) |>
+  filter(region == region_abbr) |>
+  inner_join(state_hauls, by = c("haul" = "HAUL", "vessel" = "VESSEL", "cruise" = "CRUISE")) |>
   distinct(stationid, stratum) |>
   nrow()
 
@@ -83,8 +83,8 @@ fish_3nm_wt <- catch_state %>%
     SPECIES_CODE >= 40001 ~ "invert"
   )) %>%
   filter(taxon == "fish") %>%
-  mutate(total_weight_kg = as.numeric(TOTAL_WEIGHT_KG_STATE )) %>%
-  summarize(total = sum(TOTAL_WEIGHT_KG_STATE )) %>%
+  mutate(total_weight_kg = as.numeric(TOTAL_WEIGHT_KG_STATE)) %>%
+  summarize(total = sum(TOTAL_WEIGHT_KG_STATE)) %>%
   as.numeric()
 
 
@@ -105,7 +105,7 @@ fish_all_wt <- catch_total %>%
     SPECIES_CODE >= 40001 ~ "invert"
   )) %>%
   filter(taxon == "fish") %>%
-  mutate(total_weight_kg = as.numeric(TOTAL_WEIGHT_KG )) %>%
+  mutate(total_weight_kg = as.numeric(TOTAL_WEIGHT_KG)) %>%
   summarize(total = sum(TOTAL_WEIGHT_KG)) %>%
   as.numeric()
 
@@ -172,8 +172,8 @@ voucher_all_count <- voucher_all %>%
 voucher_fish_taxa <- catch0 |>
   dplyr::left_join(haul0 %>% dplyr::select(hauljoin, abundance_haul)) |>
   dplyr::filter(region == SRVY &
-                  cruise == cruise1 &
-                  !is.na(voucher)) |>
+    cruise == cruise1 &
+    !is.na(voucher)) |>
   dplyr::group_by(species_code) |>
   dplyr::summarise(count = n()) |>
   dplyr::left_join(species0) |>
@@ -208,14 +208,14 @@ oto_3nm_taxa <- voucher_age_3nm %>%
 
 # Total catch
 total_wt_all_catch <- catch_total %>%
-  summarize(total = sum(TOTAL_WEIGHT_KG )) %>%
+  summarize(total = sum(TOTAL_WEIGHT_KG)) %>%
   as.numeric()
 total_wt_all_80 <- total_wt_all_catch * 0.8
 
 
 # Total 3nm catch
 total_wt_3nm_catch <- catch_state %>%
-  summarize(total = sum(TOTAL_WEIGHT_KG_STATE )) %>%
+  summarize(total = sum(TOTAL_WEIGHT_KG_STATE)) %>%
   as.numeric()
 total_wt_3nm_80 <- total_wt_3nm_catch * 0.8
 
@@ -270,13 +270,13 @@ voucher_age_all <- dplyr::bind_rows(voucher_count, age_count) |>
 voucher_taxa <- catch0 |>
   dplyr::left_join(haul0 %>% dplyr::select(hauljoin, abundance_haul)) |>
   dplyr::filter(region == SRVY &
-                  cruise == cruise1 &
-                  !is.na(voucher)) |>
+    cruise == cruise1 &
+    !is.na(voucher)) |>
   dplyr::group_by(species_code) |>
   dplyr::mutate(taxon = dplyr::case_when(
     species_code <= 31550 ~ "fish",
     species_code >= 40001 ~ "invert"
-  )) 
+  ))
 
 voucher_fish_taxa_count <- voucher_taxa |>
   dplyr::filter(taxon == "fish") |>
@@ -292,20 +292,24 @@ voucher_invert_taxa_count <- voucher_taxa |>
 
 voucher_fish_taxa_count_3nm <- voucher_taxa |>
   dplyr::filter(taxon == "fish") |>
-  right_join(state_hauls, by = c("vessel" = "VESSEL",
-                                 "haul" = "HAUL",
-                                 "cruise" = "CRUISE")) |>
-  dplyr::filter(!is.na(hauljoin)) |>  # these are hauls that are outside 3nm
+  right_join(state_hauls, by = c(
+    "vessel" = "VESSEL",
+    "haul" = "HAUL",
+    "cruise" = "CRUISE"
+  )) |>
+  dplyr::filter(!is.na(hauljoin)) |> # these are hauls that are outside 3nm
   distinct(species_code) |>
   nrow() |>
   as.numeric()
 
 voucher_invert_taxa_count_3nm <- voucher_taxa |>
   dplyr::filter(taxon == "invert") |>
-  right_join(state_hauls, by = c("vessel" = "VESSEL",
-                                 "haul" = "HAUL",
-                                 "cruise" = "CRUISE")) |>
-  dplyr::filter(!is.na(hauljoin)) |>  # these are hauls that are outside 3nm
+  right_join(state_hauls, by = c(
+    "vessel" = "VESSEL",
+    "haul" = "HAUL",
+    "cruise" = "CRUISE"
+  )) |>
+  dplyr::filter(!is.na(hauljoin)) |> # these are hauls that are outside 3nm
   distinct(species_code) |>
   nrow() |>
   as.numeric()
@@ -364,13 +368,13 @@ voucher_age_all <- dplyr::bind_rows(voucher_count, age_count) |>
 voucher_taxa <- catch0 |>
   dplyr::left_join(haul0 %>% dplyr::select(hauljoin, abundance_haul)) |>
   dplyr::filter(region == SRVY &
-                  cruise == cruise1 &
-                  !is.na(voucher)) |>
+    cruise == cruise1 &
+    !is.na(voucher)) |>
   dplyr::group_by(species_code) |>
   dplyr::mutate(taxon = dplyr::case_when(
     species_code <= 31550 ~ "fish",
     species_code >= 40001 ~ "invert"
-  )) 
+  ))
 
 voucher_fish_taxa_count <- voucher_taxa |>
   dplyr::filter(taxon == "fish") |>
@@ -386,20 +390,24 @@ voucher_invert_taxa_count <- voucher_taxa |>
 
 voucher_fish_taxa_count_3nm <- voucher_taxa |>
   dplyr::filter(taxon == "fish") |>
-  right_join(state_hauls, by = c("vessel" = "VESSEL",
-                                 "haul" = "HAUL",
-                                 "cruise" = "CRUISE")) |>
-  dplyr::filter(!is.na(hauljoin)) |>  # these are hauls that are outside 3nm
+  right_join(state_hauls, by = c(
+    "vessel" = "VESSEL",
+    "haul" = "HAUL",
+    "cruise" = "CRUISE"
+  )) |>
+  dplyr::filter(!is.na(hauljoin)) |> # these are hauls that are outside 3nm
   distinct(species_code) |>
   nrow() |>
   as.numeric()
 
 voucher_invert_taxa_count_3nm <- voucher_taxa |>
   dplyr::filter(taxon == "invert") |>
-  right_join(state_hauls, by = c("vessel" = "VESSEL",
-                                 "haul" = "HAUL",
-                                 "cruise" = "CRUISE")) |>
-  dplyr::filter(!is.na(hauljoin)) |>  # these are hauls that are outside 3nm
+  right_join(state_hauls, by = c(
+    "vessel" = "VESSEL",
+    "haul" = "HAUL",
+    "cruise" = "CRUISE"
+  )) |>
+  dplyr::filter(!is.na(hauljoin)) |> # these are hauls that are outside 3nm
   distinct(species_code) |>
   nrow() |>
   as.numeric()
