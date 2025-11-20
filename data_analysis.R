@@ -157,33 +157,33 @@ inverts_all_wt <- catch_summary %>%
 # good past here #count rows??
 # count of vouchers collected within 3nm
 voucher_3nm_count <- voucher_3nm %>%
-  filter(comment == "Voucher") %>%
-  summarize(total = sum(count)) %>%
+  filter(SAMPLE_TYPE == "Voucher") %>%
+  summarize(total = sum(N_RECORDS_STATE)) %>%
   as.numeric()
 
 # count of vouchers collected in all survey #theres a zero
 voucher_all_count <- voucher_all %>%
-  filter(comment == "Voucher") %>%
-  summarize(total = sum(count)) %>%
+  filter(SAMPLE_TYPE == "Voucher") %>%
+  summarize(total = sum(N_RECORDS_TOTAL)) %>%
   as.numeric()
 
 # total count of taxa otolith were collected from in all survey
 oto_taxa <- voucher_all %>%
-  filter(comment == "Age Sample") %>%
+  filter(SAMPLE_TYPE == "Otoliths") %>%
   nrow()
 
 # total count of all survey otoliths collected
 oto_all <- voucher_all %>%
-  filter(comment == "Age Sample") %>%
-  mutate(count = as.numeric(count)) %>%
-  summarize(total = sum(count)) %>%
+  filter(SAMPLE_TYPE == "Otoliths") %>%
+  mutate(N_RECORDS_TOTAL = as.numeric(N_RECORDS_TOTAL)) %>%
+  summarize(total = sum(N_RECORDS_TOTAL)) %>%
   as.numeric()
 
 # total count of otoliths collected from within 3nm
 oto_3nm <- voucher_3nm %>%
-  filter(comment == "Age Sample") %>%
-  mutate(count = as.numeric(count)) %>%
-  summarize(total = sum(count)) %>%
+  filter(SAMPLE_TYPE == "Otoliths") %>%
+  mutate(N_RECORDS_STATE = as.numeric(N_RECORDS_STATE)) %>%
+  summarize(total = sum(N_RECORDS_STATE)) %>%
   as.numeric()
 
 # total count of taxa otoliths were collected from within 3nm
