@@ -30,11 +30,11 @@ cruise1 <- 202501
 # summary tables -----------------------------------------------------------
 # data tables from Sean code needed for report
 # Load tables made in 'data_analysis.R'
-catch_summary_3nm <- readr::read_csv(here::here(
+catch_state <- readr::read_csv(here::here(
   "output", tolower(SRVY),
   paste0(tolower(SRVY), "_", cruise1, "_adfg_catch_state.csv")
 ))
-catch_summary <- readr::read_csv(here::here(
+catch_total <- readr::read_csv(here::here(
   "output", tolower(SRVY),
   paste0(tolower(SRVY), "_", cruise1, "_adfg_catch_total.csv")
 ))
@@ -96,7 +96,7 @@ voucher_count <- catch0 |>
                 N_RECORDS_TOTAL = count)
 
 # find out how to put together the new specimen table with the above voucher
-voucher_all <- dplyr::bind_rows(voucher_count, age_count) |>
+voucher_age_all <- dplyr::bind_rows(voucher_count, age_count) |>
   dplyr::select(COMMON_NAME, SPECIES_NAME, N_RECORDS_TOTAL, SAMPLE_TYPE)
 
 
