@@ -40,6 +40,11 @@ state_hauls <-
   dplyr::mutate(STATE_WATERS = "STATE_KG") |>
   unique()
 
+# save this table; we need it later
+write.csv(state_hauls, 
+          file = paste0("./output/", region, "/", region, "_", cruise, "_state_hauls.csv"), 
+          row.names = FALSE)
+
 # Connect
 channel <- navmaps::get_connected(schema = "AFSC")
 
