@@ -58,21 +58,21 @@ state_hauls <- read.csv("output/goa/goa_202501_state_hauls.csv")
 voucher_count_3nm <- catch0 |>
   dplyr::left_join(haul0 %>% dplyr::select(hauljoin, stationid, stratum, abundance_haul)) |>
   dplyr::filter(region == SRVY &
-    # stationid %in% stations_3nm0$stationid &
     cruise == cruise1 &
     !is.na(voucher)) |>
-  dplyr::right_join(state_hauls, by = c('cruise'='CRUISE','vessel'='VESSEL','haul'='HAUL')) |> # keep only stuff in state hauls
+  dplyr::right_join(state_hauls, by = c("cruise" = "CRUISE", "vessel" = "VESSEL", "haul" = "HAUL")) |> # keep only stuff in state hauls
   dplyr::filter(!is.na(species_code)) |> # remove entries that aren't in state_hauls
   dplyr::group_by(species_code) |>
   dplyr::summarise(count = n()) |>
   dplyr::left_join(species0) |> # add common names and species names
   dplyr::mutate(SAMPLE_TYPE = "Voucher") |>
-  dplyr::rename(SPECIES_CODE = "species_code",
-                SPECIES_NAME = "species_name",
-                COMMON_NAME = "common_name",
-                N_RECORDS_STATE = "count"
-                ) 
- 
+  dplyr::rename(
+    SPECIES_CODE = "species_code",
+    SPECIES_NAME = "species_name",
+    COMMON_NAME = "common_name",
+    N_RECORDS_STATE = "count"
+  )
+
 
 # combine and stack vouchers and age samples
 voucher_age_3nm <- dplyr::bind_rows(voucher_count_3nm, age_count_3nm) %>%
@@ -90,72 +90,13 @@ voucher_count <- catch0 |>
   dplyr::summarise(count = n()) |>
   dplyr::left_join(species0) |>
   dplyr::mutate(SAMPLE_TYPE = "Voucher") |>
-  dplyr::rename(SPECIES_CODE = species_code,
-                COMMON_NAME = common_name,
-                SPECIES_NAME = species_name,
-                N_RECORDS_TOTAL = count)
+  dplyr::rename(
+    SPECIES_CODE = species_code,
+    COMMON_NAME = common_name,
+    SPECIES_NAME = species_name,
+    N_RECORDS_TOTAL = count
+  )
 
 # find out how to put together the new specimen table with the above voucher
 voucher_age_all <- dplyr::bind_rows(voucher_count, age_count) |>
   dplyr::select(COMMON_NAME, SPECIES_NAME, N_RECORDS_TOTAL, SAMPLE_TYPE)
-
-
-# Old catch_summary and age_count tables ----------------------------------
-#### used for 2024, 2023 adfg report. Switched to using navmaps and gap.products
-# catch_summary_3nm <- catch0 %>%
-#   dplyr::select(number_fish, weight, hauljoin, cruisejoin, cruise, region, species_code) %>%
-#   dplyr::left_join(haul0 %>% dplyr::select(hauljoin, cruisejoin, stationid, stratum, abundance_haul)) %>%
-#   # dplyr::filter(abundance_haul == "Y") %>%
-#   dplyr::inner_join(stations_3nm0 %>%
-#                       dplyr::select(stationid, stratum) %>%
-#                       dplyr::distinct()) %>%
-#   dplyr::filter(region == SRVY &
-#                   cruise == cruise1) %>%
-#   dplyr::group_by(species_code) %>%
-#   dplyr::summarise(
-#     total_count = sum(number_fish, na.rm = TRUE),
-#     total_weight_kg = sum(weight, na.rm = TRUE)
-#   ) %>%
-#   ungroup() %>%
-#   dplyr::left_join(species0) %>%
-#   dplyr::select(species_code, common_name, species_name, total_weight_kg, total_count)
-
-# catch_summary <- catch0 %>%
-#   dplyr::filter(region == SRVY &
-#                   cruise == cruise1) %>%
-#   dplyr::left_join(haul0 %>% dplyr::select(hauljoin, abundance_haul)) %>%
-#   # dplyr::filter(abundance_haul == "Y") %>%
-#   dplyr::group_by(species_code) %>%
-#   dplyr::summarise(
-#     total_count = sum(number_fish, na.rm = TRUE),
-#     total_weight_kg = sum(weight, na.rm = TRUE)
-#   ) %>%
-#   ungroup() %>%
-#   dplyr::left_join(species0) %>%
-#   dplyr::select(species_code, common_name, species_name, total_weight_kg, total_count)
-
-# counts of age samples
-# age_count_3nm <- specimen0 %>%
-#   dplyr::left_join(haul0 %>% dplyr::select(hauljoin, stationid, stratum, abundance_haul)) %>%
-#   # dplyr::filter(abundance_haul == "Y") %>%
-#   dplyr::inner_join(stations_3nm0 %>%
-#                       dplyr::select(stationid, stratum) %>%
-#                       dplyr::distinct()) %>%
-#   dplyr::filter(region == SRVY &
-#                   stationid %in% stations_3nm0$stationid &
-#                   cruise == cruise1 &
-#                   specimen_sample_type == 1) %>%
-#   dplyr::group_by(species_code) %>%
-#   dplyr::summarise(count = n()) %>%
-#   dplyr::mutate(comment = "Age Sample")
-# counts of age samples
-#
-# age_count <- specimen0 %>%
-#   dplyr::left_join(haul0 %>% dplyr::select(hauljoin, abundance_haul)) %>%
-#   # dplyr::filter(abundance_haul == "Y") %>%
-#   dplyr::filter(region == SRVY &
-#                   cruise == cruise1 &
-#                   specimen_sample_type == 1) %>%
-#   dplyr::group_by(species_code) %>%
-#   dplyr::summarise(count = n()) %>%
-#   dplyr::mutate(comment = "Age Sample")
