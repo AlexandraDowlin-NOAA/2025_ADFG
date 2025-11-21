@@ -48,6 +48,15 @@ age_count <- readr::read_csv(here::here(
   paste0(tolower(SRVY), "_", cruise1, "_adfg_specimens_total.csv")
 ))
 
+vouchers_state <- readr::read_csv(here::here(
+  "output", tolower(SRVY),
+  paste0(tolower(SRVY), "_", cruise1, "_adfg_voucher_state.csv")
+))
+vouchers_total <- readr::read_csv(here::here(
+  "output", tolower(SRVY),
+  paste0(tolower(SRVY), "_", cruise1, "_adfg_voucher_total.csv")
+))
+
 
 # Table of hauls within 3 nm ----------------------------------------------
 state_hauls <- read.csv("output/goa/goa_202501_state_hauls.csv")
