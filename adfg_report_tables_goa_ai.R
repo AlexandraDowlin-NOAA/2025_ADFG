@@ -207,6 +207,14 @@ if(!dir.exists(here::here("output",region,"tables"))){
   dir.create(here::here("output",region,"tables"))
 }
 
+write.csv(x = voucher_state,
+          file = here::here("output", region, paste0(region, "_", cruise, "_adfg_voucher_state.csv")),
+          row.names = FALSE)
+
+write.csv(x = voucher_total,
+          file = here::here("output", region, paste0(region, "_", cruise, "_adfg_voucher_total.csv")),
+          row.names = FALSE)
+
 write.csv(x = catch_state,
           file = here::here("output", region, paste0(region, "_", cruise, "_adfg_catch_state.csv")),
           row.names = FALSE)
