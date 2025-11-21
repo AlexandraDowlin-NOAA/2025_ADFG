@@ -29,11 +29,11 @@ data_finalized <- "13 September, 2023"
 
 #  Short values -----------------------------------------------------------
 # successful biomass tows 526sql
-s_stations <- haul0 %>%
-  filter(abundance_haul == "Y") %>%
-  filter(cruise == cruise_id) %>%
-  filter(region == region_abbr) %>%
-  distinct(stationid, stratum) %>%
+s_stations <- haul0 |>
+  filter(abundance_haul == "Y") |>
+  filter(cruise == cruise_id) |>
+  filter(region == region_abbr) |>
+  distinct(stationid, stratum) |>
   nrow()
 
 
@@ -42,19 +42,19 @@ t_stations <- "520" # Confirmed this is the allocation for GOA 2023
 
 
 # total of attempted hauls 555sql, 550 r
-a_hauls <- haul0 %>%
-  filter(region == region_abbr) %>%
-  filter(cruise == cruise_id) %>%
-  filter(haul_type == "3") %>%
+a_hauls <- haul0 |>
+  filter(region == region_abbr) |>
+  filter(cruise == cruise_id) |>
+  filter(haul_type == "3") |>
   nrow()
 # MCS note: if you modify the SQL code to be haul_type = 3 (as in the R code) you'll get the same answer as R. I had 550 tows attempted in my data report!
 
 # total of unsuccessful hauls 29sql, 24 r
-u_hauls <- haul0 %>%
-  filter(region == region_abbr) %>%
-  filter(cruise == cruise_id) %>%
-  filter(abundance_haul == "N") %>%
-  filter(haul_type == "3") %>%
+u_hauls <- haul0 |>
+  filter(region == region_abbr) |>
+  filter(cruise == cruise_id) |>
+  filter(abundance_haul == "N") |>
+  filter(haul_type == "3") |>
   nrow()
 # MCS note: this one is the same. If you filter the sql script to be haul_type = 3 you'll get the same number as in R. I'm not sure which is better, but 24 is the number I have in my report, so I'd say we should stick to that one.
 
@@ -76,85 +76,85 @@ fish_3nm <- catch_state |>
   dplyr::mutate(taxon = dplyr::case_when(
     SPECIES_CODE <= 31550 ~ "fish",
     SPECIES_CODE >= 40001 ~ "invert"
-  )) %>%
+  )) |>
   filter(taxon == "fish") |>
   nrow()
 
 # total weight of fish taxa encountered within 3nm
-fish_3nm_wt <- catch_state %>%
+fish_3nm_wt <- catch_state |>
   dplyr::mutate(taxon = dplyr::case_when(
     SPECIES_CODE <= 31550 ~ "fish",
     SPECIES_CODE >= 40001 ~ "invert"
-  )) %>%
-  filter(taxon == "fish") %>%
-  mutate(total_weight_kg = as.numeric(TOTAL_WEIGHT_KG_STATE)) %>%
-  summarize(total = sum(TOTAL_WEIGHT_KG_STATE)) %>%
+  )) |>
+  filter(taxon == "fish") |>
+  mutate(total_weight_kg = as.numeric(TOTAL_WEIGHT_KG_STATE)) |>
+  summarize(total = sum(TOTAL_WEIGHT_KG_STATE)) |>
   as.numeric()
 
 
 # total count of fish taxa encountered in all survey
-fish_all <- catch_total %>%
+fish_all <- catch_total |>
   dplyr::mutate(taxon = dplyr::case_when(
     SPECIES_CODE <= 31550 ~ "fish",
     SPECIES_CODE >= 40001 ~ "invert"
-  )) %>%
-  filter(taxon == "fish") %>%
+  )) |>
+  filter(taxon == "fish") |>
   nrow()
 
 
 # total weight of fish taxa encountered in all survey
-fish_all_wt <- catch_total %>%
+fish_all_wt <- catch_total |>
   dplyr::mutate(taxon = dplyr::case_when(
     SPECIES_CODE <= 31550 ~ "fish",
     SPECIES_CODE >= 40001 ~ "invert"
-  )) %>%
-  filter(taxon == "fish") %>%
-  mutate(total_weight_kg = as.numeric(TOTAL_WEIGHT_KG)) %>%
-  summarize(total = sum(TOTAL_WEIGHT_KG)) %>%
+  )) |>
+  filter(taxon == "fish") |>
+  mutate(total_weight_kg = as.numeric(TOTAL_WEIGHT_KG)) |>
+  summarize(total = sum(TOTAL_WEIGHT_KG)) |>
   as.numeric()
 
 
 # total count of invert taxa within 3nm
-inverts_3nm <- catch_state %>%
+inverts_3nm <- catch_state |>
   dplyr::mutate(taxon = dplyr::case_when(
     SPECIES_CODE <= 31550 ~ "fish",
     SPECIES_CODE >= 40001 ~ "invert"
-  )) %>%
-  filter(taxon == "invert") %>%
+  )) |>
+  filter(taxon == "invert") |>
   nrow()
 
 
 # total weight of invert taxa within 3nm
-inverts_3nm_wt <- catch_state %>%
+inverts_3nm_wt <- catch_state |>
   dplyr::mutate(taxon = dplyr::case_when(
     SPECIES_CODE <= 31550 ~ "fish",
     SPECIES_CODE >= 40001 ~ "invert"
-  )) %>%
-  filter(taxon == "invert") %>%
-  mutate(total_weight_kg = as.numeric(TOTAL_WEIGHT_KG_STATE)) %>%
-  summarize(total = sum(TOTAL_WEIGHT_KG_STATE)) %>%
+  )) |>
+  filter(taxon == "invert") |>
+  mutate(total_weight_kg = as.numeric(TOTAL_WEIGHT_KG_STATE)) |>
+  summarize(total = sum(TOTAL_WEIGHT_KG_STATE)) |>
   as.numeric()
 
 
 # total count of invert taxa in all survey
-inverts_all <- catch_total %>%
+inverts_all <- catch_total |>
   dplyr::mutate(taxon = dplyr::case_when(
     SPECIES_CODE <= 31550 ~ "fish",
     SPECIES_CODE >= 40001 ~ "invert"
-  )) %>%
-  filter(taxon == "invert") %>%
+  )) |>
+  filter(taxon == "invert") |>
   nrow()
 
 
 # total weight of invert taxa in all survey
-inverts_all_wt <- catch_total %>%
+inverts_all_wt <- catch_total |>
   dplyr::mutate(taxon = dplyr::case_when(
     SPECIES_CODE <= 31550 ~ "fish",
     SPECIES_CODE >= 40001 ~ "invert"
-  )) %>%
-  filter(taxon == "invert") %>%
-  mutate(total_weight_kg = as.numeric(TOTAL_WEIGHT_KG)) %>%
-  summarize(total = sum(TOTAL_WEIGHT_KG)) %>%
+  )) |>
+  filter(taxon == "invert") |>
+  mutate(total_weight_kg = as.numeric(TOTAL_WEIGHT_KG)) |>
+  summarize(total = sum(TOTAL_WEIGHT_KG)) |>
   as.numeric()
 
 
@@ -163,7 +163,7 @@ inverts_all_wt <- catch_total %>%
 # Voucher summary 3nm ----------------------------------------------------------
 # MCS: need to confirm! does this look like a reasonable # of vouchers in state waters?
 voucher_count_3nm <- catch0 |>
-  dplyr::left_join(haul0 %>% dplyr::select(hauljoin, stationid, stratum, abundance_haul)) |>
+  dplyr::left_join(haul0 |> dplyr::select(hauljoin, stationid, stratum, abundance_haul)) |>
   dplyr::filter(region == SRVY &
                   cruise == cruise1 &
                   !is.na(voucher)) |>
@@ -182,7 +182,7 @@ voucher_count_3nm <- catch0 |>
 
 
 # combine and stack vouchers and age samples
-voucher_age_3nm <- dplyr::bind_rows(voucher_count_3nm, age_count_3nm) %>%
+voucher_age_3nm <- dplyr::bind_rows(voucher_count_3nm, age_count_3nm) |>
   dplyr::select(COMMON_NAME, SPECIES_NAME, N_RECORDS_STATE, SAMPLE_TYPE)
 
 
@@ -287,38 +287,38 @@ voucher_invert_taxa <- vouchers_total |>
 
 # AGE SAMPLES -------------------------------------------------------------
 # total count of taxa otolith were collected from in all survey
-oto_taxa <- voucher_age_all %>%
-  filter(SAMPLE_TYPE == "Otoliths") %>%
+oto_taxa <- voucher_age_all |>
+  filter(SAMPLE_TYPE == "Otoliths") |>
   nrow()
 
 # total count of all survey otoliths collected
-oto_all <- voucher_age_all %>%
-  filter(SAMPLE_TYPE == "Otoliths") %>%
-  summarize(total = sum(N_RECORDS_TOTAL)) %>%
+oto_all <- voucher_age_all |>
+  filter(SAMPLE_TYPE == "Otoliths") |>
+  summarize(total = sum(N_RECORDS_TOTAL)) |>
   as.numeric()
 
 # total count of otoliths collected from within 3nm
-oto_3nm <- voucher_age_3nm %>%
-  filter(SAMPLE_TYPE == "Otoliths") %>%
-  mutate(N_RECORDS_STATE = as.numeric(N_RECORDS_STATE)) %>%
-  summarize(total = sum(N_RECORDS_STATE)) %>%
+oto_3nm <- voucher_age_3nm |>
+  filter(SAMPLE_TYPE == "Otoliths") |>
+  mutate(N_RECORDS_STATE = as.numeric(N_RECORDS_STATE)) |>
+  summarize(total = sum(N_RECORDS_STATE)) |>
   as.numeric()
 
 # total count of taxa otoliths were collected from within 3nm
-oto_3nm_taxa <- voucher_age_3nm %>%
-  filter(SAMPLE_TYPE == "Otoliths") %>%
+oto_3nm_taxa <- voucher_age_3nm |>
+  filter(SAMPLE_TYPE == "Otoliths") |>
   nrow()
 
 
 # Total catch
-total_wt_all_catch <- catch_total %>%
-  summarize(total = sum(TOTAL_WEIGHT_KG)) %>%
+total_wt_all_catch <- catch_total |>
+  summarize(total = sum(TOTAL_WEIGHT_KG)) |>
   as.numeric()
 total_wt_all_80 <- total_wt_all_catch * 0.8
 
 
 # Total 3nm catch
-total_wt_3nm_catch <- catch_state %>%
-  summarize(total = sum(TOTAL_WEIGHT_KG_STATE)) %>%
+total_wt_3nm_catch <- catch_state |>
+  summarize(total = sum(TOTAL_WEIGHT_KG_STATE)) |>
   as.numeric()
 total_wt_3nm_80 <- total_wt_3nm_catch * 0.8
