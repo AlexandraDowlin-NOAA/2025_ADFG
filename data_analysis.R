@@ -12,7 +12,7 @@ region_abbr <- "GOA" # "AI"
 
 dates_conducted <- "25 May and 6 August" # check dates for vessels
 
-survnumber <- "Eighteenth" # 17 for GOA in 2023 (1993 to present) #14 for AI in 2024 (1991 to present) ##differs by survey
+survnumber <- "eighteenth" # 17 for GOA in 2023 (1993 to present) #14 for AI in 2024 (1991 to present) ##differs by survey
 
 time_series <- "30 year time series" # Ask about this data point, X amount of years from survey standardization
 
