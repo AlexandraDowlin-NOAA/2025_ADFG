@@ -165,8 +165,9 @@ inverts_all_wt <- catch_total |>
 voucher_count_3nm <- catch0 |>
   dplyr::left_join(haul0 |> dplyr::select(hauljoin, stationid, stratum, abundance_haul)) |>
   dplyr::filter(region == SRVY &
-                  cruise == cruise1 &
-                  !is.na(voucher)) |>
+                  cruise == cruise1 #&
+                #  !is.na(voucher)
+                ) |>
   dplyr::right_join(state_hauls, by = c("cruise" = "CRUISE", "vessel" = "VESSEL", "haul" = "HAUL")) |> # keep only stuff in state hauls
   dplyr::filter(!is.na(species_code)) |> # remove entries that aren't in state_hauls
   dplyr::group_by(species_code) |>
@@ -196,7 +197,7 @@ voucher_count <- catch0 |>
   dplyr::group_by(species_code) |>
   dplyr::summarise(count = n()) |>
   dplyr::left_join(species0) |>
-  dplyr::mutate(SAMPLE_TYPE = "Voucher") |>
+  #dplyr::mutate(SAMPLE_TYPE = "Voucher") |>
   dplyr::rename(
     SPECIES_CODE = species_code,
     COMMON_NAME = common_name,
