@@ -93,7 +93,7 @@ specimen <-
   dplyr::mutate(STATE_WATERS = ifelse(is.na(STATE_WATERS), "FEDERAL", "STATE"))
 
 # Get taxonomic info
-worms_taxa <- 
+survey_taxa <- 
   RODBC::sqlQuery(
     channel = channel,
     query = "
@@ -104,8 +104,30 @@ worms_taxa <-
       FROM
         GAP_PRODUCTS.TAXONOMIC_CLASSIFICATION
       WHERE 
-        DATABASE = 'WORMS'"
+        SURVEY_SPECIES = 1 "
   )
+
+taxon_changes <- worms_taxa <- 
+  RODBC::sqlQuery(
+    channel = channel,
+    query = "
+      SELECT DISTINCT 
+        OLD_SPECIES_NAME, 
+        NEW_SPECIES_NAME,
+        OLD_SPECIES_CODE, 
+        NEW_SPECIES_CODE
+      FROM
+        GAP_PRODUCTS.TAXONOMIC_CHANGES
+      WHERE 
+        ACTION IN ('change taxon code/name', 'new taxon added')"
+  )
+
+worms_taxa <- taxon_changes |>
+  dplyr::rename('SPECIES_CODE' = 'OLD_SPECIES_CODE',
+                'SPECIES_NAME' = 'NEW_SPECIES_NAME') |>
+  bind_rows(survey_taxa) |>
+  select(-NEW_SPECIES_CODE, -OLD_SPECIES_NAME)
+  
 
 # Get specimen types
 
