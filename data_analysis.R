@@ -10,7 +10,7 @@ regionw_abbr <- "Gulf of Alaska (GOA)" # "Aleutian Islands (AI)"
 
 region_abbr <- "GOA" # "AI"
 
-dates_conducted <- "25 May and 6 August" # check dates for vessels
+dates_conducted <- "25 May and 3 August" # check dates for vessels
 
 survnumber <- "eighteenth" # 17 for GOA in 2023 (1993 to present) #14 for AI in 2024 (1991 to present) ##differs by survey
 
