@@ -24,7 +24,7 @@ vessel2 <- "FV Alaska Provider"
 
 cruise_id <- 202501
 
-data_finalized <- "13 September, 2023"
+data_finalized <- "25 August, 2025"
 
 
 #  Short values -----------------------------------------------------------
