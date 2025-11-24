@@ -46,14 +46,14 @@ Survey data products are available upon request through the GAP data request rep
 <!-- Catch Summary Table - Within 3-mile Territorial Waters -->
 ```{r, catch-summary-table}
 library(here)
-catch_sum_3nm <- catch_state %>% 
+catch_sum_3nm <- catch_state |> 
   separate(SPECIES_NAME, c("species", "species_suffix"),
     sep = "(?= sp\\.)", extra = "merge", remove = FALSE
-  ) %>%
+  ) |>
   mutate(species_suffix = case_when(
     stringr::str_count(species, "\\w+") == 1 & is.na(species_suffix) ~ species,
     TRUE ~ species_suffix
-  )) %>%
+  )) |>
   separate(species, c("species_2", "egg_case"), sep = "(?=egg case)", remove = TRUE) %>%
   mutate(new_suffix = coalesce(species_suffix, egg_case)) %>%
   dplyr::select(-species_suffix, -egg_case)
@@ -81,21 +81,21 @@ flextable::flextable(catch_sum_3nm, col_keys = c("COMMON_NAME", "dummy_col", "TO
     value = flextable::as_paragraph(
       flextable::as_i(species_2),
       "", new_suffix
-  )) %>%
-  flextable::add_header_lines("Table 1. 2025 Catch summary table - totals within 3-mile territorial waters (Alaska state waters); \"--\" indicates cases where counts are not typically recorded (e.g., colonial organisms or species that are easily damaged or fragmented in the catch).", top = TRUE) %>%
-  flextable::font(fontname = "Times New Roman", part = "all") %>%
-  flextable::fontsize(size = 12, part = "all") %>%
-  flextable::theme_vanilla() %>%
+  )) |>
+  flextable::add_header_lines("Table 1. 2025 Catch summary table - totals within 3-mile territorial waters (Alaska state waters); \"--\" indicates cases where counts are not typically recorded (e.g., colonial organisms or species that are easily damaged or fragmented in the catch).", top = TRUE) |>
+  flextable::font(fontname = "Times New Roman", part = "all") |>
+  flextable::fontsize(size = 12, part = "all") |>
+  flextable::theme_vanilla() |>
   flextable::set_header_labels(
     COMMON_NAME = "Common name",
     dummy_col = "Scientific name",
     TOTAL_WEIGHT_KG_STATE_CHR = "Weight in kg",
     TOTAL_COUNT_STATE = "Number of individuals"
-  )%>%
-  flextable::width(width = 2.2, j = 1:1) %>%
-  flextable::width(width = 2.7, j = 2:2) %>%
-  flextable::width(width = 1.0, j = 3:4) %>%
-  flextable::align(align = "right", j = 3:4, part = "all") %>%
+  ) |>
+  flextable::width(width = 2.2, j = 1:1) |>
+  flextable::width(width = 2.7, j = 2:2) |>
+  flextable::width(width = 1.0, j = 3:4) |>
+  flextable::align(align = "right", j = 3:4, part = "all") |>
   flextable::align(align = "left", j = 1:2, part = "all") 
 ```
 
@@ -114,9 +114,14 @@ catch_sum_all <- catch_total %>%
     stringr::str_count(species, "\\w+") == 1 & is.na(species_suffix) ~ species,
     TRUE ~ species_suffix
   )) %>%
-  separate(species, c("species_2", "egg_case"), sep = "(?=egg case)", remove = TRUE) %>%
-  mutate(new_suffix = coalesce(species_suffix, egg_case)) %>%
-  dplyr::select(-species_suffix, -egg_case)
+  separate(species, c("species_2", "egg_case"), sep = "(?=egg case)", remove = TRUE, extra = "merge") %>%
+  
+  # NEW: separate out "egg" when it appears alone as a trailing suffix
+  separate(species_2, c("species_2", "egg_only"),
+           sep = "(?= egg$)", remove = TRUE, extra = "merge") %>%
+  
+  mutate(new_suffix = coalesce(species_suffix, egg_case, egg_only)) %>%
+  dplyr::select(-species_suffix, -egg_case, -egg_only)
 
 # Round total counts and format with commas
 catch_sum_all$TOTAL_COUNT <-  format(round(catch_sum_all$TOTAL_COUNT), big.mark = ",")  
@@ -124,12 +129,11 @@ catch_sum_all$TOTAL_COUNT[which(catch_sum_all$TOTAL_COUNT=="      0")] <- "--"
 ##catch_sum_all$TOTAL_COUNT[which(catch_sum_all$SPECIES_CODE %in% dashes_lookup$species_code)] <- "--" #no counts for certain taxa
 
 # Round total weight and format with commas
-# catch_sum_all$total_weight_kg_txt <-  format(round(catch_sum_all$total_weight_kg,digits = 2), big.mark = ",")
-# catch_sum_all$total_weight_kg_txt[catch_sum_all$total_weight_kg < 0.01] <- "< 0.01"
-
 catch_sum_all$TOTAL_WEIGHT_KG_CHR <- NA # add a column
 catch_sum_all$TOTAL_WEIGHT_KG_CHR <- format(round(catch_sum_all$TOTAL_WEIGHT_KG, digits = 2), big.mark = ",")
-catch_sum_all$TOTAL_WEIGHT_KG_CHR[catch_sum_3nm$TOTAL_WEIGHT_KG < 0.01] <- "< 0.01"
+catch_sum_all$TOTAL_WEIGHT_KG_CHR[catch_sum_all$TOTAL_WEIGHT_KG < 0.01] <- "< 0.01"
+
+
 
 for (i in 1:nrow(catch_sum_all)) {
   if (!is.na(catch_sum_all$new_suffix[i])) {
@@ -140,7 +144,7 @@ for (i in 1:nrow(catch_sum_all)) {
 }
 
 
-flextable::flextable(catch_sum_all, col_keys = c("COMMON_NAME", "dummy_col", "TOTAL_WEIGHT_KG", "TOTAL_COUNT")) %>% 
+flextable::flextable(catch_sum_all, col_keys = c("COMMON_NAME", "dummy_col", "TOTAL_WEIGHT_KG_CHR", "TOTAL_COUNT")) %>% 
   flextable::mk_par(j = "dummy_col",
     value = flextable::as_paragraph(
       flextable::as_i(species_2),
@@ -153,7 +157,7 @@ flextable::flextable(catch_sum_all, col_keys = c("COMMON_NAME", "dummy_col", "TO
   flextable::set_header_labels(
     COMMON_NAME = "Common name",
     dummy_col = "Scientific name",
-    TOTAL_WEIGHT_KG = "Weight in kg",
+    TOTAL_WEIGHT_KG_CHR = "Weight in kg",
     TOTAL_COUNT = "Number of individuals"
   ) %>%
   flextable::width(width = 2.2, j = 1:1) %>%
