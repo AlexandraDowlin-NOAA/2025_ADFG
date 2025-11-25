@@ -1,7 +1,7 @@
 # Use run.R to create entire ADFG document
 #  MCS proposed order of files -------------------------------------------------
 # I am just adding these here but a different flow could make more sense! I'm not totally attached to this order of operations.
-refresh_tables <- FALSE #set to true if downloading new data
+refresh_tables <- TRUE #set to true if downloading new data
 
 source("./functions.R")
 
