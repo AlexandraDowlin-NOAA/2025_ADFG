@@ -38,7 +38,7 @@ s_stations <- haul0 |>
 
 
 # Total planned stations
-t_stations <- "520" # Confirmed this is the allocation for GOA 2023
+t_stations <- "480" # Confirmed this is the allocation for GOA 2023
 
 
 # total of attempted hauls 555sql, 550 r
