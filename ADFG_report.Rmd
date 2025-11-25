@@ -65,7 +65,6 @@ catch_sum_3nm <- catch_state |>
 # Round total counts and format with commas
 catch_sum_3nm$TOTAL_COUNT_STATE <- format(round(catch_sum_3nm$TOTAL_COUNT_STATE), big.mark = ",")
 catch_sum_3nm$TOTAL_COUNT_STATE[which(catch_sum_3nm$TOTAL_COUNT_STATE == "     0")] <- "--"
-#catch_sum_3nm$TOTAL_COUNT_STATE[which(catch_sum_3nm$SPECIES_CODE %in% dashes_lookup$species_code)] <- "--" #no counts for certain taxa # MCS NOTE: CANNOT FIND DASHES_LOOKUP TABLE. DO WE ACTUALLY NEED IT?
 
 # Round total weight and format with commas
 catch_sum_3nm$TOTAL_WEIGHT_KG_STATE_CHR <- NA # add a column
@@ -129,14 +128,12 @@ catch_sum_all <- catch_total %>%
 
 # Round total counts and format with commas
 catch_sum_all$TOTAL_COUNT <-  format(round(catch_sum_all$TOTAL_COUNT), big.mark = ",")  
-catch_sum_all$TOTAL_COUNT[which(catch_sum_all$TOTAL_COUNT=="      0")] <- "--"
-##catch_sum_all$TOTAL_COUNT[which(catch_sum_all$SPECIES_CODE %in% dashes_lookup$species_code)] <- "--" #no counts for certain taxa
+catch_sum_all$TOTAL_COUNT[which(catch_sum_all$TOTAL_COUNT=="     0")] <- "--"
 
 # Round total weight and format with commas
 catch_sum_all$TOTAL_WEIGHT_KG_CHR <- NA # add a column
 catch_sum_all$TOTAL_WEIGHT_KG_CHR <- format(round(catch_sum_all$TOTAL_WEIGHT_KG, digits = 2), big.mark = ",")
 catch_sum_all$TOTAL_WEIGHT_KG_CHR[catch_sum_all$TOTAL_WEIGHT_KG < 0.01] <- "< 0.01"
-
 
 
 for (i in 1:nrow(catch_sum_all)) {
