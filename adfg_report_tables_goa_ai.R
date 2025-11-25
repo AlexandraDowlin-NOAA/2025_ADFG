@@ -107,7 +107,7 @@ survey_taxa <-
         SURVEY_SPECIES = 1 "
   )
 
-taxon_changes <- worms_taxa <- 
+taxon_changes <- 
   RODBC::sqlQuery(
     channel = channel,
     query = "
