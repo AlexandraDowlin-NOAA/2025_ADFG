@@ -41,7 +41,7 @@ for(ii in 1:length(software_types)) {
    )
   
   # 5. Trawlable/untrawlable station grid (lines) and marks
-  trawlable_grid <- sf::st_read(here::here("assets", "data", "allocation", "goa_stations_2025.gpkg")) |>
+  trawlable_grid <- sf::st_read(here::here("data", "goa_stations_2025.gpkg")) |>
     sf::st_transform(crs = "WGS84") |>
     sf::st_set_geometry("geometry") |>
     sf::st_wrap_dateline() |>
