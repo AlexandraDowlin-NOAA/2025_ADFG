@@ -12,8 +12,6 @@ region_abbr <- "GOA" # "AI"
 
 dates_conducted <- "25 May and 3 August" # check dates for vessels
 
-survnumber <- "eighteenth" # 17 for GOA in 2023 (1993 to present) #14 for AI in 2024 (1991 to present) ##differs by survey
-
 time_series <- "31 year time series" # Ask about this data point, X amount of years from survey standardization
 
 series_begun <- "1993" # AI is 1991 #GOA is 1993
@@ -26,6 +24,8 @@ cruise_id <- 202501
 
 data_finalized <- "25 August, 2025"
 
+# survey number -----------------------------------------------------------
+load(file = paste0("output/",tolower(region_abbr),"/",tolower(region_abbr),"_",cruise_id,"_","survnumber.rds")) # survnumber
 
 #  Short values -----------------------------------------------------------
 # successful biomass tows 526sql

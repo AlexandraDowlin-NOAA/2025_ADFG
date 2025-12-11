@@ -1,4 +1,4 @@
-# Author: Sean Rohan 
+# Author: Sean Rohan
 
 # Set vessel, cruise, and region ----
 vessel <- c(148, 176)
@@ -6,7 +6,7 @@ cruise <- 202501
 region <- tolower("goa")
 
 # Retrieve towpath lines -- need to first generate towpaths using make_layers_goa.R or make_layers_ai.R
-towpaths <- 
+towpaths <-
   sf::st_read(
     dsn = here::here("output", region, "shapefiles", paste0(region, "_towpath.shp"))
   ) |>
@@ -16,23 +16,23 @@ towpaths <-
 nrow(towpaths)
 
 # Retrieve Alaska DNR Land polygon from akgfmaps ----
-layers <- 
+layers <-
   akgfmaps::get_base_layers(
-    select.region = region, 
+    select.region = region,
     set.crs = "EPSG:3338",
     high.resolution.coast = TRUE
   )
 
 # Add 3 nm buffer to land ----
-land_buffer <- 
+land_buffer <-
   layers$akland |>
   dplyr::filter(STATE_PROVINCE == "Alaska") |>
   sf::st_buffer(
-    dist = 3*1852, # 3 nautical miles
+    dist = 3 * 1852, # 3 nautical miles
     single_side = TRUE
   )
 
-state_hauls <- 
+state_hauls <-
   towpaths |>
   sf::st_intersection(land_buffer) |>
   sf::st_drop_geometry() |>
@@ -41,19 +41,21 @@ state_hauls <-
   unique()
 
 # save this table; we need it later
-write.csv(state_hauls, 
-          file = paste0("./output/", region, "/", region, "_", cruise, "_state_hauls.csv"), 
-          row.names = FALSE)
+write.csv(state_hauls,
+  file = paste0("./output/", region, "/", region, "_", cruise, "_state_hauls.csv"),
+  row.names = FALSE
+)
 
 # Connect
 channel <- navmaps::get_connected(schema = "AFSC")
 
 # Retrieve catch and specimen data
-catch <- 
+catch <-
   RODBC::sqlQuery(
     channel = channel,
-    query = 
-      paste0("
+    query =
+      paste0(
+        "
   SELECT 
     VESSEL,
     CRUISE,
@@ -65,17 +67,20 @@ catch <-
   FROM RACEBASE.CATCH
   WHERE
     VESSEL IN (", paste(vessel, collapse = ", "), ")",
-             "AND CRUISE = ", cruise)
+        "AND CRUISE = ", cruise
+      )
   ) |>
   dplyr::left_join(state_hauls,
-                   by = c("VESSEL", "CRUISE", "HAUL")) |>
+    by = c("VESSEL", "CRUISE", "HAUL")
+  ) |>
   dplyr::mutate(STATE_WATERS = ifelse(is.na(STATE_WATERS), "FEDERAL", "STATE"))
 
-specimen <- 
+specimen <-
   RODBC::sqlQuery(
     channel = channel,
-    query = 
-      paste0("
+    query =
+      paste0(
+        "
   SELECT 
     VESSEL,
     CRUISE,
@@ -86,14 +91,16 @@ specimen <-
   FROM RACEBASE.SPECIMEN
   WHERE
     VESSEL IN (", paste(vessel, collapse = ", "), ")",
-             "AND CRUISE = ", cruise)
+        "AND CRUISE = ", cruise
+      )
   ) |>
   dplyr::left_join(state_hauls,
-                   by = c("VESSEL", "CRUISE", "HAUL")) |>
+    by = c("VESSEL", "CRUISE", "HAUL")
+  ) |>
   dplyr::mutate(STATE_WATERS = ifelse(is.na(STATE_WATERS), "FEDERAL", "STATE"))
 
 # Get taxonomic info
-survey_taxa <- 
+survey_taxa <-
   RODBC::sqlQuery(
     channel = channel,
     query = "
@@ -107,7 +114,7 @@ survey_taxa <-
         SURVEY_SPECIES = 1 "
   )
 
-taxon_changes <- 
+taxon_changes <-
   RODBC::sqlQuery(
     channel = channel,
     query = "
@@ -123,15 +130,17 @@ taxon_changes <-
   )
 
 worms_taxa <- taxon_changes |>
-  dplyr::rename('SPECIES_CODE' = 'OLD_SPECIES_CODE',
-                'SPECIES_NAME' = 'NEW_SPECIES_NAME') |>
+  dplyr::rename(
+    "SPECIES_CODE" = "OLD_SPECIES_CODE",
+    "SPECIES_NAME" = "NEW_SPECIES_NAME"
+  ) |>
   bind_rows(survey_taxa) |>
   select(-NEW_SPECIES_CODE, -OLD_SPECIES_NAME)
-  
+
 
 # Get specimen types
 
-specimen_sample_type <- 
+specimen_sample_type <-
   RODBC::sqlQuery(
     channel = channel,
     query = "
@@ -142,38 +151,43 @@ specimen_sample_type <-
         RACE_DATA.SPECIMEN_SAMPLE_TYPES"
   )
 
-
 # Calculate total catch and weight
-catch_by_area <- 
+catch_by_area <-
   catch |>
   dplyr::group_by(STATE_WATERS, SPECIES_CODE) |>
-  dplyr::summarise(TOTAL_WEIGHT_KG = sum(WEIGHT, na.rm = TRUE),
-                   TOTAL_COUNT = sum(NUMBER_FISH, na.rm = TRUE),
-                   .groups = "keep")
+  dplyr::summarise(
+    TOTAL_WEIGHT_KG = sum(WEIGHT, na.rm = TRUE),
+    TOTAL_COUNT = sum(NUMBER_FISH, na.rm = TRUE),
+    .groups = "keep"
+  )
 
-catch_state <- 
+catch_state <-
   catch_by_area |>
   dplyr::filter(STATE_WATERS == "STATE") |>
-  tidyr::pivot_wider(id_cols = "SPECIES_CODE", 
-                     values_from = c("TOTAL_COUNT", "TOTAL_WEIGHT_KG"), 
-                     names_from = "STATE_WATERS") |>
+  tidyr::pivot_wider(
+    id_cols = "SPECIES_CODE",
+    values_from = c("TOTAL_COUNT", "TOTAL_WEIGHT_KG"),
+    names_from = "STATE_WATERS"
+  ) |>
   dplyr::left_join(worms_taxa, by = "SPECIES_CODE") |>
   dplyr::arrange(-TOTAL_WEIGHT_KG_STATE) |>
   dplyr::select(COMMON_NAME, SPECIES_NAME, SPECIES_CODE, TOTAL_WEIGHT_KG_STATE, TOTAL_COUNT_STATE)
 
-catch_total <- 
+catch_total <-
   catch_by_area |>
   dplyr::ungroup() |>
   dplyr::group_by(SPECIES_CODE) |>
-  dplyr::summarise(TOTAL_WEIGHT_KG = sum(TOTAL_WEIGHT_KG, na.rm = TRUE),
-                   TOTAL_COUNT = sum(TOTAL_COUNT, na.rm = TRUE)) |>
+  dplyr::summarise(
+    TOTAL_WEIGHT_KG = sum(TOTAL_WEIGHT_KG, na.rm = TRUE),
+    TOTAL_COUNT = sum(TOTAL_COUNT, na.rm = TRUE)
+  ) |>
   dplyr::left_join(worms_taxa, by = "SPECIES_CODE") |>
   dplyr::arrange(-TOTAL_WEIGHT_KG) |>
   dplyr::select(COMMON_NAME, SPECIES_NAME, SPECIES_CODE, TOTAL_WEIGHT_KG, TOTAL_COUNT)
 
 
 # Tally vouchers
-vouchers_state <- 
+vouchers_state <-
   catch |>
   dplyr::filter(STATE_WATERS == "STATE", !is.na(VOUCHER)) |>
   dplyr::left_join(worms_taxa, by = "SPECIES_CODE") |>
@@ -182,7 +196,7 @@ vouchers_state <-
   dplyr::arrange(SPECIES_CODE) |>
   dplyr::mutate(SAMPLE_TYPE = "Voucher")
 
-vouchers_total <- 
+vouchers_total <-
   catch |>
   dplyr::filter(!is.na(VOUCHER)) |>
   dplyr::left_join(worms_taxa, by = "SPECIES_CODE") |>
@@ -193,7 +207,7 @@ vouchers_total <-
 
 
 # Tally specimens
-specimen_state <- 
+specimen_state <-
   specimen |>
   dplyr::filter(STATE_WATERS == "STATE") |>
   dplyr::left_join(worms_taxa, by = "SPECIES_CODE") |>
@@ -202,7 +216,7 @@ specimen_state <-
   dplyr::summarise(N_RECORDS_STATE = n(), .groups = "keep") |>
   dplyr::arrange(-N_RECORDS_STATE)
 
-specimen_total <- 
+specimen_total <-
   specimen |>
   dplyr::left_join(worms_taxa, by = "SPECIES_CODE") |>
   dplyr::left_join(specimen_sample_type, by = "SPECIMEN_SAMPLE_TYPE") |>
@@ -225,30 +239,61 @@ specimen_voucher_total <-
   )
 
 # Write to .csv
-if(!dir.exists(here::here("output",region,"tables"))){
-  dir.create(here::here("output",region,"tables"))
+if (!dir.exists(here::here("output", region, "tables"))) {
+  dir.create(here::here("output", region, "tables"))
 }
 
-write.csv(x = vouchers_state,
-          file = here::here("output", region, paste0(region, "_", cruise, "_adfg_voucher_state.csv")),
-          row.names = FALSE)
+write.csv(
+  x = vouchers_state,
+  file = here::here("output", region, paste0(region, "_", cruise, "_adfg_voucher_state.csv")),
+  row.names = FALSE
+)
 
-write.csv(x = vouchers_total,
-          file = here::here("output", region, paste0(region, "_", cruise, "_adfg_voucher_total.csv")),
-          row.names = FALSE)
+write.csv(
+  x = vouchers_total,
+  file = here::here("output", region, paste0(region, "_", cruise, "_adfg_voucher_total.csv")),
+  row.names = FALSE
+)
 
-write.csv(x = catch_state,
-          file = here::here("output", region, paste0(region, "_", cruise, "_adfg_catch_state.csv")),
-          row.names = FALSE)
+write.csv(
+  x = catch_state,
+  file = here::here("output", region, paste0(region, "_", cruise, "_adfg_catch_state.csv")),
+  row.names = FALSE
+)
 
-write.csv(x = catch_total,
-          file = here::here("output", region, paste0(region, "_", cruise, "_adfg_catch_total.csv")),
-          row.names = FALSE)
+write.csv(
+  x = catch_total,
+  file = here::here("output", region, paste0(region, "_", cruise, "_adfg_catch_total.csv")),
+  row.names = FALSE
+)
 
-write.csv(x = specimen_state,
-          file = here::here("output", region, paste0(region, "_", cruise, "_adfg_specimens_state.csv")),
-          row.names = FALSE)
+write.csv(
+  x = specimen_state,
+  file = here::here("output", region, paste0(region, "_", cruise, "_adfg_specimens_state.csv")),
+  row.names = FALSE
+)
 
-write.csv(x = specimen_total,
-          file = here::here("output", region, paste0(region, "_", cruise, "_adfg_specimens_total.csv")),
-          row.names = FALSE)
+write.csv(
+  x = specimen_total,
+  file = here::here("output", region, paste0(region, "_", cruise, "_adfg_specimens_total.csv")),
+  row.names = FALSE
+)
+
+
+# Get nth cruise number ---------------------------------------------------
+# This SQL script came directly from Ned as of 12/11/25 in this doc: https://docs.google.com/document/d/1HsSr-z5zQUet6dk_NGVfobmsf8lfd_Yx/edit
+survnumber <-
+  RODBC::sqlQuery(
+    channel = channel,
+    query = "
+      select distinct floor(cruise/100) survey_year
+      from racebase.haul
+      where region = 'GOA'
+      and abundance_haul = 'Y'
+      order by floor(cruise/100);"
+  ) |>
+  nrow() |>
+  scales::ordinal()
+
+save(survnumber, file = paste0("output/", region, "/", region, "_", cruise, "_survnumber.rds"))
+
