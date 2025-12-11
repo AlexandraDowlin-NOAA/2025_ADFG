@@ -26,7 +26,6 @@ cruise1 <- 202501
 # SRVY <- "AI"
 # cruise1 <- 202201
 
-
 # summary tables -----------------------------------------------------------
 # data tables from Sean code needed for report
 # Load tables made in 'data_analysis.R'
