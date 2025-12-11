@@ -12,9 +12,9 @@ region_abbr <- "GOA" # "AI"
 
 dates_conducted <- "25 May and 3 August" # check dates for vessels
 
-time_series <- "31 year time series" # Ask about this data point, X amount of years from survey standardization
+time_series <- "35 year time series" # Ask about this data point, X amount of years from survey standardization. Value was 35 for GOA in 2025.
 
-series_begun <- "1993" # AI is 1991 #GOA is 1993
+series_begun <- ifelse(region_abbr == "GOA", 1990, 1991) # AI is 1991 #GOA is 1993
 
 vessel1 <- "FV Ocean Explorer"
 
