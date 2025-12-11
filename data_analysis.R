@@ -25,7 +25,8 @@ cruise_id <- 202501
 data_finalized <- "25 August, 2025"
 
 # survey number -----------------------------------------------------------
-load(file = paste0("output/",tolower(region_abbr),"/",tolower(region_abbr),"_",cruise_id,"_","survnumber.rds")) # survnumber
+# generated from Oracle tables using SQL script from Ned
+load(file = paste0("output/", tolower(region_abbr), "/", tolower(region_abbr), "_", cruise_id, "_", "survnumber.rds")) # survnumber
 
 #  Short values -----------------------------------------------------------
 # successful biomass tows 526sql
@@ -165,9 +166,8 @@ inverts_all_wt <- catch_total |>
 voucher_count_3nm <- catch0 |>
   dplyr::left_join(haul0 |> dplyr::select(hauljoin, stationid, stratum, abundance_haul)) |>
   dplyr::filter(region == SRVY &
-                  cruise == cruise1 &
-                  !is.na(voucher)
-                ) |>
+    cruise == cruise1 &
+    !is.na(voucher)) |>
   dplyr::right_join(state_hauls, by = c("cruise" = "CRUISE", "vessel" = "VESSEL", "haul" = "HAUL")) |> # keep only stuff in state hauls
   dplyr::filter(!is.na(species_code)) |> # remove entries that aren't in state_hauls
   dplyr::group_by(species_code) |>
@@ -192,8 +192,8 @@ voucher_age_3nm <- dplyr::bind_rows(voucher_count_3nm, age_count_3nm) |>
 voucher_count <- catch0 |>
   dplyr::left_join(haul0 %>% dplyr::select(hauljoin, abundance_haul)) |>
   dplyr::filter(region == SRVY &
-                  cruise == cruise1 &
-                  !is.na(voucher)) |> # pull out only voucher entries
+    cruise == cruise1 &
+    !is.na(voucher)) |> # pull out only voucher entries
   dplyr::group_by(species_code) |>
   dplyr::summarise(count = n()) |>
   dplyr::left_join(species0) |>
@@ -212,8 +212,8 @@ voucher_age_all <- dplyr::bind_rows(voucher_count, age_count) |>
 voucher_taxa <- catch0 |>
   dplyr::left_join(haul0 %>% dplyr::select(hauljoin, abundance_haul)) |>
   dplyr::filter(region == SRVY &
-                  cruise == cruise1 &
-                  !is.na(voucher)) |>
+    cruise == cruise1 &
+    !is.na(voucher)) |>
   dplyr::group_by(species_code) |>
   dplyr::mutate(taxon = dplyr::case_when(
     species_code <= 31550 ~ "fish",
