@@ -50,111 +50,117 @@ write.csv(state_hauls,
 channel <- navmaps::get_connected(schema = "AFSC")
 
 # Retrieve catch and specimen data
-catch_y <- RODBC::sqlQuery(
-  channel = channel,
-  query =
-    paste0(
-    "select 
-    b.VESSEL,
-    b.CRUISE,
-    b.HAUL,
-    b.WEIGHT,
-    b.NUMBER_FISH,
-    b.VOUCHER,
-    b.SPECIES_CODE
-from racebase.haul a
-join racebase.catch b
-  on a.HAULJOIN = b.HAULJOIN
-where a.region = 'GOA'
-and a.cruise = 202501
-and a.abundance_haul = 'Y' 
-and b.VESSEL IN (", paste(vessel, collapse = ", "), ")",
-    "AND b.CRUISE = ", cruise)
-) |>
-  dplyr::left_join(state_hauls,
-                   by = c("VESSEL", "CRUISE", "HAUL")
-) |>
-  dplyr::mutate(STATE_WATERS = ifelse(is.na(STATE_WATERS), "FEDERAL", "STATE"))
 
-# use only catch data from ABUNDANCE_HAUL==Y hauls
-catch <- catch_y
-# catch <-
-#   RODBC::sqlQuery(
-#     channel = channel,
-#     query =
-#       paste0(
-#         "
-#   SELECT 
-#     VESSEL,
-#     CRUISE,
-#     HAUL,
-#     SPECIES_CODE,
-#     WEIGHT,
-#     NUMBER_FISH,
-#     VOUCHER
-#   FROM RACEBASE.CATCH
-#   WHERE
-#     VESSEL IN (", paste(vessel, collapse = ", "), ")",
-#         "AND CRUISE = ", cruise
-#       )
-#   ) |>
+# If you ever need to use abundance_haul==Y:
+# catch_y <- RODBC::sqlQuery(
+#   channel = channel,
+#   query =
+#     paste0(
+#     "select 
+#     b.VESSEL,
+#     b.CRUISE,
+#     b.HAUL,
+#     b.WEIGHT,
+#     b.NUMBER_FISH,
+#     b.VOUCHER,
+#     b.SPECIES_CODE
+# from racebase.haul a
+# join racebase.catch b
+#   on a.HAULJOIN = b.HAULJOIN
+# where a.region = 'GOA'
+# and a.cruise = 202501
+# and a.abundance_haul = 'Y' 
+# and b.VESSEL IN (", paste(vessel, collapse = ", "), ")",
+#     "AND b.CRUISE = ", cruise)
+# ) |>
 #   dplyr::left_join(state_hauls,
-#     by = c("VESSEL", "CRUISE", "HAUL")
-#   ) |>
+#                    by = c("VESSEL", "CRUISE", "HAUL")
+# ) |>
 #   dplyr::mutate(STATE_WATERS = ifelse(is.na(STATE_WATERS), "FEDERAL", "STATE"))
+# 
+# # use only catch data from ABUNDANCE_HAUL==Y hauls
+# catch <- catch_y
 
 
-
-specimen_y <- 
+catch <-
   RODBC::sqlQuery(
     channel = channel,
     query =
       paste0(
-        "select 
-    b.VESSEL,
-    b.CRUISE,
-    b.HAUL,
-    b.SPECIES_CODE,
-    SPECIMENID,
-    SPECIMEN_SAMPLE_TYPE
-from racebase.haul a
-join racebase.specimen b
-  on a.HAULJOIN = b.HAULJOIN
-where a.region = 'GOA'
-and a.cruise = 202501
-and a.abundance_haul = 'Y' 
-and b.VESSEL IN (", paste(vessel, collapse = ", "), ")",
-        "AND b.CRUISE = ", cruise)
+        "
+  SELECT
+    VESSEL,
+    CRUISE,
+    HAUL,
+    SPECIES_CODE,
+    WEIGHT,
+    NUMBER_FISH,
+    VOUCHER
+  FROM RACEBASE.CATCH
+  WHERE
+    VESSEL IN (", paste(vessel, collapse = ", "), ")",
+        "AND CRUISE = ", cruise
+      )
   ) |>
   dplyr::left_join(state_hauls,
-                   by = c("VESSEL", "CRUISE", "HAUL")
+    by = c("VESSEL", "CRUISE", "HAUL")
   ) |>
   dplyr::mutate(STATE_WATERS = ifelse(is.na(STATE_WATERS), "FEDERAL", "STATE"))
 
-specimen <- specimen_y
-# specimen <-
+
+
+# If you ever need to use abundance_haul==Y:
+# specimen_y <- 
 #   RODBC::sqlQuery(
 #     channel = channel,
 #     query =
 #       paste0(
-#         "
-#   SELECT 
-#     VESSEL,
-#     CRUISE,
-#     HAUL,
-#     SPECIES_CODE,
+#         "select 
+#     b.VESSEL,
+#     b.CRUISE,
+#     b.HAUL,
+#     b.SPECIES_CODE,
 #     SPECIMENID,
 #     SPECIMEN_SAMPLE_TYPE
-#   FROM RACEBASE.SPECIMEN
-#   WHERE
-#     VESSEL IN (", paste(vessel, collapse = ", "), ")",
-#         "AND CRUISE = ", cruise
-#       )
+# from racebase.haul a
+# join racebase.specimen b
+#   on a.HAULJOIN = b.HAULJOIN
+# where a.region = 'GOA'
+# and a.cruise = 202501
+# and a.abundance_haul = 'Y' 
+# and b.VESSEL IN (", paste(vessel, collapse = ", "), ")",
+#         "AND b.CRUISE = ", cruise)
 #   ) |>
 #   dplyr::left_join(state_hauls,
 #                    by = c("VESSEL", "CRUISE", "HAUL")
 #   ) |>
 #   dplyr::mutate(STATE_WATERS = ifelse(is.na(STATE_WATERS), "FEDERAL", "STATE"))
+# 
+# specimen <- specimen_y
+
+specimen <-
+  RODBC::sqlQuery(
+    channel = channel,
+    query =
+      paste0(
+        "
+  SELECT
+    VESSEL,
+    CRUISE,
+    HAUL,
+    SPECIES_CODE,
+    SPECIMENID,
+    SPECIMEN_SAMPLE_TYPE
+  FROM RACEBASE.SPECIMEN
+  WHERE
+    VESSEL IN (", paste(vessel, collapse = ", "), ")",
+        "AND CRUISE = ", cruise
+      )
+  ) |>
+  dplyr::left_join(state_hauls,
+                   by = c("VESSEL", "CRUISE", "HAUL")
+  ) |>
+  dplyr::mutate(STATE_WATERS = ifelse(is.na(STATE_WATERS), "FEDERAL", "STATE"))
 # 
 
 # Get taxonomic info
